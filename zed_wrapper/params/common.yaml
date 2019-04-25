@@ -15,9 +15,9 @@ general:
     zed_id:                     -1
     serial_number:              0
     resolution:                 2                                   # '0': HD2K, '1': HD1080, '2': HD720, '3': VGA
-    frame_rate:                 30
+    frame_rate:                 60
     gpu_id:                     -1
-    base_frame:                 'base_link'                         # must be equal to the frame_id used in the URDF file
+    base_frame:                 'zed_camera_center'                 # must be equal to the frame_id used in the URDF file
     camera_frame:               'zed_camera_center'                 # must be equal to the frame_id used in the URDF file
     left_camera_frame:          'zed_left_camera_frame'             # must be equal to the frame_id used in the URDF file
     left_camera_optical_frame:  'zed_left_camera_optical_frame'     # must be equal to the frame_id used in the URDF file
@@ -44,13 +44,13 @@ depth:
     confidence_root:            'confidence'                        # default `confidence/confidence_image` and `confidence/confidence_map`
 
 tracking:
-    publish_tf:                 true                                # publish `odom -> base_link` TF
-    publish_map_tf:             true                                # publish `map -> odom` TF
-    world_frame:                'map'                               # the reference fixed frame (same as `map_frame` or `odometry_frame`)
+    publish_tf:                 false                               # publish `odom -> base_link` TF
+    publish_map_tf:             false                               # publish `map -> odom` TF
+    world_frame:                'zed_map'                           # the reference fixed frame (same as `map_frame` or `odometry_frame`)
     map_frame:                  'map'
-    odometry_frame:             'odom'
+    odometry_frame:             'local_origin'
     odometry_db:                ''
-    spatial_memory:             true                                # Enable to detect loop closure
+    spatial_memory:             false                               # Enable to detect loop closure
     floor_alignment:            false                               # Enable to automatically calculate camera/floor offset
     initial_base_pose:          [0.0,0.0,0.0, 0.0,0.0,0.0]          # [X, Y, Z, R, P, Y]
     pose_topic:                 'pose'
