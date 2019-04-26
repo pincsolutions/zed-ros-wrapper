@@ -22,7 +22,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     <arg name="camera_model"         default="1" /> <!-- 0=ZED, 1=ZEDM-->
     <arg name="serial_number"        default="0" />
     <arg name="verbose"              default="true" />
-    <arg name="resolution"           default="2" /> <!--0=RESOLUTION_HD2K, 1=RESOLUTION_HD1080, 2=RESOLUTION_HD720, 3=RESOLUTION_VGA -->
+    <arg name="resolution"           default="3" /> <!--0=RESOLUTION_HD2K, 1=RESOLUTION_HD1080, 2=RESOLUTION_HD720, 3=RESOLUTION_VGA -->
     <arg name="frame_rate"           default="60" />
     <!-- RESOLUTION_HD2K   -> 2208*1242, available framerates: 15 fps.
          RESOLUTION_HD1080 -> 1920*1080, available framerates: 15, 30 fps.
@@ -30,13 +30,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
          RESOLUTION_VGA    -> 672*376,   available framerates: 15, 30, 60, 100 fps. -->
 
     <!-- Coordinate frame -->
-    <arg name="pose_frame"           default="zed_map" />    <!--zed_map  -->
-    <arg name="odometry_frame"       default="local_origin" />          <!-- local_origin  -->
-    <arg name="use_spatial_memory"   default="false" />
-    <arg name="use_pose_smoothing"   default="false" />
+    <arg name="pose_frame"           default="local_origin" />
+    <arg name="odometry_frame"       default="nothing_odom" />
 
     <group ns="zed">
-        <include file="$(find zed_wrapper)/launch/zed_camera.launch">
+        <include file="$(find zed_wrapper)/launch/zed_camera_pose.launch">
             <arg name="svo_file"            value="$(arg svo_file)" />
             <arg name="pose_frame"          value="$(arg pose_frame)" />
             <arg name="odometry_frame"      value="$(arg odometry_frame)" />
@@ -45,8 +43,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             <arg name="resolution"          value="$(arg resolution)" />
             <arg name="frame_rate"          value="$(arg frame_rate)" />
             <arg name="verbose"             value="$(arg verbose)" />
-            <arg name="use_spatial_memory"  value="$(arg use_spatial_memory)" />
-            <arg name="use_pose_smoothing"  value="$(arg use_pose_smoothing)" />
         </include>
     </group>
 </launch>

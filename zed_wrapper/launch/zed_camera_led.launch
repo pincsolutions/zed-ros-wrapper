@@ -17,7 +17,7 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
 <launch>
-    <arg name="camera_model"          default="1" /> <!-- 0=ZED, 1=ZEDM-->
+    <arg name="camera_model"          default="0" /> <!-- 0=ZED, 1=ZEDM-->
     <arg name="svo_file"              default="" /><!-- <arg name="svo_file" default="path/to/svo/file.svo"> -->
     <arg name="zed_id"                default="0" />
     <!-- If a ZED SN is given, zed_id is ignored and the wrapper will specifically look for the ZED with the corresponding serial number -->
@@ -25,7 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     <arg name="verbose"               default="true" />
 
     <arg name="resolution"            default="2" /> <!--0=RESOLUTION_HD2K, 1=RESOLUTION_HD1080, 2=RESOLUTION_HD720, 3=RESOLUTION_VGA -->
-    <arg name="frame_rate"            default="60" />
+    <arg name="frame_rate"            default="30" />
     <!-- RESOLUTION_HD2K   -> 2208*1242, available framerates: 15 fps.
          RESOLUTION_HD1080 -> 1920*1080, available framerates: 15, 30 fps.
          RESOLUTION_HD720  -> 1280*720,  available framerates: 15, 30, 60 fps.
@@ -35,8 +35,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     <arg name="gpu_id"                default="-1" />
 
     <!-- Definition coordinate frames -->
-    <arg name="publish_tf"                    default="false" />		<!-- Jae set true -->
-    <arg name="publish_map_tf"                default="false" />    <!-- Jae set true -->
+    <arg name="publish_tf"                    default="false" />
+    <arg name="publish_map_tf"                default="false" />
     <arg name="pose_frame"                    default="map" />
     <arg name="odometry_frame"                default="odom" />
     <arg name="base_frame"                    default="zed_camera_center" />
@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     <arg name="right_camera_optical_frame"    default="zed_right_camera_optical_frame" />
     <arg name="imu_frame"                     default="imu_link" /> <!-- only used with ZED M -->
 
-    <arg name="initial_pose"                  default="[0.0,0.0,0.0,0.0,0.0,0.0]" /> <!-- X, Y, Z, (meter) R, P, Y, (radians)-->
+    <arg name="initial_pose"                  default="[0.0,0.0,0.0, 0.0,0.0,1.57]" /> <!-- X, Y, Z, (meter) R, P, Y, (radians)-->
 
     <!-- Publish urdf zed -->
     <arg name="publish_urdf"                  default="true" />
@@ -56,8 +56,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     <arg name="rgb_info_topic"                default="rgb/camera_info" />
     <arg name="depth_topic"                   default="depth/depth_registered" />
     <arg name="depth_cam_info_topic"          default="depth/camera_info" />
-    <arg name="use_spatial_memory"            default="false" />
-    <arg name="use_pose_smoothing"            default="false" />
 
     <node name="zed_wrapper_node" pkg="zed_wrapper" type="zed_wrapper_node" output="screen" required="true"><!-- launch-prefix="valgrind" -->
 
@@ -90,22 +88,21 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         <param name="resolution"            value="$(arg resolution)" />
         <param name="verbose"               value="$(arg verbose)" />
         <param name="mat_resize_factor"     value="1.0" />
-        <param name="quality"               value="2" /> <!--‘0’: NONE, ‘1’: PERFORMANCE, ‘2’: MEDIUM, ‘3’: QUALITY, ‘4’: ULTRA-->
+        <param name="quality"               value="2" />
         <param name="sensing_mode"          value="0" />
         <param name="frame_rate"            value="$(arg frame_rate)" />
         <param name="odometry_db"           value="" />
         <param name="openni_depth_mode"     value="0" />
         <param name="gpu_id"                value="$(arg gpu_id)" />
-        <param name="confidence"            value="90" />
+        <param name="confidence"            value="100" />
         <param name="max_depth"             value="5.0" />
-        <param name="gain"                  value="100" />  <!-- 20 -->
-        <param name="exposure"              value="100" />   <!-- 50 -->
-        <param name="auto_exposure"         value="true" />
+        <param name="gain"                  value="25" />
+        <param name="exposure"              value="30" />
+        <param name="auto_exposure"         value="false" />
         <param name="depth_stabilization"   value="1" />
-        <param name="pose_smoothing"        value="$(arg use_pose_smoothing)" />
-        <param name="spatial_memory"        value="$(arg use_spatial_memory)" />
+        <param name="pose_smoothing"        value="false" />
+        <param name="spatial_memory"        value="false" />
         <param name="floor_alignment"       value="false" />
-        <param name="depth/min_depth"       value="0.5" />
 
         <rosparam param="initial_tracking_pose" subst_value="True">$(arg initial_pose)</rosparam>
 
@@ -137,8 +134,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         <param name="pose_topic"                value="pose" />
         <param name="odometry_topic"            value="odom" />
 
-        <param name="init_odom_with_first_valid_pose"        value="true" />   
-<!--	<param name="init_odom_with_imu"        value="true" /> -->  <!-- Jae added to mitigate X slope at the end of aisle: only used with ZED M -->
+    <!--    <param name="init_odom_with_first_valid_pose"        value="false" />  -->
+  	<param name="init_odom_with_imu"        value="true" />     <!-- Jae added to mitigate Z offset at the end of aisle: only used with ZED M -->
 
         <param name="imu_topic"                 value="imu/data" /> <!-- only used with ZED M -->
         <param name="imu_topic_raw"             value="imu/data_raw" /> <!-- only used with ZED M -->
