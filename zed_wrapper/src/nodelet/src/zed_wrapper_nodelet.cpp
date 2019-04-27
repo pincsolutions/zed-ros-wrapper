@@ -997,6 +997,7 @@ namespace zed_wrapper {
     void ZEDWrapperNodelet::publishImage(sl::Mat img,
                                          image_transport::Publisher& pubImg,
                                          string imgFrameId, ros::Time t) {
+        camInfoMsg -> header.stamp = t;
         pubImg.publish(sl_tools::imageToROSmsg(img, imgFrameId, t));
     }
 
