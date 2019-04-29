@@ -46,7 +46,7 @@ depth:
 tracking:
     publish_tf:                 true                               # publish `odom -> base_link` TF
     publish_map_tf:             true                               # publish `map -> odom` TF
-    world_frame:                'zed_map'                           # the reference fixed frame (same as `map_frame` or `odometry_frame`)
+    world_frame:                'map'                           # the reference fixed frame (same as `map_frame` or `odometry_frame`)
     map_frame:                  'map'
     odometry_frame:             'local_origin'
     odometry_db:                ''
