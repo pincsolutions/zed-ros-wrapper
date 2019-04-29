@@ -19,7 +19,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 <launch>
     <arg name="node_name_1"          default="zed_node_1" />
     <arg name="node_name_2"          default="zed_node_2" />
-    <arg name="camera_model_1"       default="zed" /> <!-- 'zed' or 'zedm' -->
+    <arg name="camera_model_1"       default="zedm" /> <!-- 'zed' or 'zedm' -->
     <arg name="camera_model_2"       default="zedm" /> <!-- 'zed' or 'zedm' -->
     <arg name="publish_urdf"         default="true" />
 
@@ -29,6 +29,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             <arg name="camera_model"        value="$(arg camera_model_1)" />
             <arg name="publish_urdf"        value="$(arg publish_urdf)" />
             <arg name="camera_id"           value="0" />
+            <arg name="common_yaml"         value="common1.yaml" />
         </include>
     </group>
 
@@ -38,6 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             <arg name="camera_model"        value="$(arg camera_model_2)" />
             <arg name="publish_urdf"        value="$(arg publish_urdf)" />
             <arg name="camera_id"           value="1" />
+            <arg name="common_yaml"         value="common2.yaml" />
         </include>
     </group>
 </launch>

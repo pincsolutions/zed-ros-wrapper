@@ -38,6 +38,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     <arg name="camera_id"             default="-1" />
     <arg name="gpu_id"                default="-1" />
 
+    <arg name="common_yaml"			  default="common.yaml" />
+
     <!-- ROS URDF description of the ZED -->
     <group if="$(arg publish_urdf)">
         <param name="zed_description" textfile="$(find zed_wrapper)/urdf/$(arg camera_model).urdf" />
@@ -47,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     </group>
 
     <node name="$(arg node_name)" pkg="zed_wrapper" type="zed_wrapper_node" output="screen" required="true"><!-- launch-prefix="valgrind" -->
-        <rosparam file="$(find zed_wrapper)/params/common.yaml" command="load" />
+        <rosparam file="$(find zed_wrapper)/params/$(arg common_yaml)" command="load" />
         <rosparam file="$(find zed_wrapper)/params/$(arg camera_model).yaml" command="load" />
 
         <!-- SVO file path -->
