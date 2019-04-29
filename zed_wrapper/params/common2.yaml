@@ -19,10 +19,10 @@ general:
     gpu_id:                     -1
     base_frame:                 'base_link'                 # must be equal to the frame_id used in the URDF file
     camera_frame:               'zed_camera_center2'                 # must be equal to the frame_id used in the URDF file
-    left_camera_frame:          'zed_left_camera_frame'             # must be equal to the frame_id used in the URDF file
-    left_camera_optical_frame:  'zed_left_camera_optical_frame'     # must be equal to the frame_id used in the URDF file
-    right_camera_frame:         'zed_right_camera_frame'            # must be equal to the frame_id used in the URDF file
-    right_camera_optical_frame: 'zed_right_camera_optical_frame'    # must be equal to the frame_id used in the URDF file
+    left_camera_frame:          'zed_left_camera_frame2'             # must be equal to the frame_id used in the URDF file
+    left_camera_optical_frame:  'zed_left_camera_optical_frame2'     # must be equal to the frame_id used in the URDF file
+    right_camera_frame:         'zed_right_camera_frame2'            # must be equal to the frame_id used in the URDF file
+    right_camera_optical_frame: 'zed_right_camera_optical_frame2'    # must be equal to the frame_id used in the URDF file
     verbose:                    true
     svo_compression:            4                                   # `0`: RAW (no compression), `1`: LOSSLESS (PNG/ZSTD), `2`: LOSSY (JPEG), `3`: AVCHD (H264 SDK v2.7), `4`: HEVC (H265 SDK v2.7)
 
@@ -52,7 +52,7 @@ tracking:
     odometry_db:                ''
     spatial_memory:             false                               # Enable to detect loop closure
     floor_alignment:            false                               # Enable to automatically calculate camera/floor offset
-    initial_base_pose:          [0.0,0.0,0.0, 0.0,0.0,0.0]          # [X, Y, Z, R, P, Y]
+    initial_base_pose:          [0.0,0.0,0.0, 0.0, 0,0.0]          # [X, Y, Z, R, P, Y]
     pose_topic:                 'pose'
     publish_pose_covariance:    true                                # Enable to publish the `pose_with_covariance` message
     fixed_covariance:           false                               # Set the covariance for pose and odometry to a diagonal matrix with `fixed_cov_value` on the diagonal

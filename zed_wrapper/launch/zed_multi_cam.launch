@@ -34,12 +34,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     </group>
 
     <group ns="zed_2">
-        <include file="$(find zed_wrapper)/launch/zed_camera.launch">
+        <include file="$(find zed_wrapper)/launch/zed_camera2.launch">
             <arg name="node_name"           value="$(arg node_name_2)" />
             <arg name="camera_model"        value="$(arg camera_model_2)" />
             <arg name="publish_urdf"        value="$(arg publish_urdf)" />
             <arg name="camera_id"           value="1" />
             <arg name="common_yaml"         value="common2.yaml" />
         </include>
-    </group>
+    </group> 
+-->       
 </launch>
