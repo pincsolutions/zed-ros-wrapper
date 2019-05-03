@@ -44,13 +44,13 @@ depth:
     confidence_root:            'confidence'                        # default `confidence/confidence_image` and `confidence/confidence_map`
 
 tracking:
-    publish_tf:                 false                               # publish `odom -> base_link` TF
-    publish_map_tf:             false                               # publish `map -> odom` TF
+    publish_tf:                 true                               # publish `odom -> base_link` TF
+    publish_map_tf:             true                               # publish `map -> odom` TF
     world_frame:                'world'                             # the reference fixed frame (same as `map_frame` or `odometry_frame`)
     map_frame:                  'map'
     odometry_frame:             'local_origin'
     odometry_db:                ''
-    spatial_memory:             false                               # Enable to detect loop closure
+    spatial_memory:             true                                # Enable to detect loop closure
     floor_alignment:            false                               # Enable to automatically calculate camera/floor offset
     initial_base_pose:          [0.0,0.0,0.0, 0.0,0.0,0.0]          # [X, Y, Z, R, P, Y]
     pose_topic:                 'pose'
