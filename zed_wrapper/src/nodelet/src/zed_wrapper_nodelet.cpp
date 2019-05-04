@@ -1196,7 +1196,8 @@ namespace zed_wrapper {
 
     void ZEDWrapperNodelet::publishOdom(tf2::Transform odom2baseTransf, sl::Pose& slPose, ros::Time t) {
         nav_msgs::Odometry odom;
-        odom.header.stamp = t;
+        //odom.header.stamp = t;
+        odom.header.stamp = ros::Time::now();
         odom.header.frame_id = mOdometryFrameId; // frame
         odom.child_frame_id = mBaseFrameId;      // camera_frame
         // conversion from Tranform to message
