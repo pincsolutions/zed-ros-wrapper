@@ -18,12 +18,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
 <robot name="zedm_camera">
 
-<!-- base_link  -->
-    <link name="base_link" />
+<!-- fcu  -->
+    <link name="fcu" />
 
 <!-- Camera Center -->
     <joint name="zed_camera_center_joint" type="fixed">
-        <parent link="base_link"/>
+        <parent link="fcu"/>
         <child link="zed_camera_center"/>
         <origin xyz="0 0 0" rpy="0 0 0" />
     </joint>
