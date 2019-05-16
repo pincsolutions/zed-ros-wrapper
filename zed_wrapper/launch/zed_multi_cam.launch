@@ -36,4 +36,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             <arg name="publish_urdf"        value="$(arg publish_urdf)" />
             <arg name="camera_id"           value="1" />
         </include>
+	<!--
+	<include file="$(find fuse_two_cameras)/launch/two_odoms.launch">
+	</include>  -->
+
 </launch>
