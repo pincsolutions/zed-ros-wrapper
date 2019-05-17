@@ -19,7 +19,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 <launch>
     <arg name="node_name_1"          default="zed1" />
     <arg name="node_name_2"          default="zed2" />
-    <arg name="camera_model_1"       default="zed" /> <!-- 'zed' or 'zedm' -->
+    <arg name="camera_model_1"       default="zedm" /> <!-- 'zed' or 'zedm' -->
     <arg name="camera_model_2"       default="zedm" /> <!-- 'zed' or 'zedm' -->
     <arg name="publish_urdf"         default="true" />
 
@@ -28,19 +28,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             <arg name="node_name"           value="$(arg node_name_2)" />
             <arg name="camera_model"        value="$(arg camera_model_2)" />
             <arg name="publish_urdf"        value="$(arg publish_urdf)" />
-            <arg name="camera_id"           value="2" />
+            <arg name="camera_id"           value="1" />
         </include>
 
 
         <include file="$(find zed_wrapper)/launch/zed_camera_1.launch">
             <arg name="node_name"           value="$(arg node_name_1)" />
-            <arg name="camera_model"        value="$(arg camera_model_2)" />
+            <arg name="camera_model"        value="$(arg camera_model_1)" />
             <arg name="publish_urdf"        value="$(arg publish_urdf)" />
             <arg name="camera_id"           value="1" />
         </include>
-
-	<!--
-	<include file="$(find fuse_two_cameras)/launch/two_odoms.launch">
-	</include>  -->
-
 </launch>
