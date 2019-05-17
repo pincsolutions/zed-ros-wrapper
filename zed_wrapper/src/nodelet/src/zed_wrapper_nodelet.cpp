@@ -199,6 +199,7 @@ namespace zed_wrapper {
         NODELET_WARN_STREAM("Please consider to upgrade to latest SDK version to "
                             "get better performances");
 
+
         mZedParams.coordinate_system = sl::COORDINATE_SYSTEM_IMAGE;
 
         NODELET_INFO_STREAM(" * Camera coordinate system\t-> COORDINATE_SYSTEM_IMAGE");
@@ -222,9 +223,38 @@ namespace zed_wrapper {
         mSignY = -1;
         mSignZ = 1;
 #else
-        mZedParams.coordinate_system = sl::COORDINATE_SYSTEM_RIGHT_HANDED_Z_UP_X_FWD;
 
-        NODELET_INFO_STREAM(" * Camera coordinate system\t-> COORDINATE_SYSTEM_RIGHT_HANDED_Z_UP_X_FWD");
+        switch (mCoordinateSystem)
+        {
+            case 0:
+                mZedParams.coordinate_system = sl::COORDINATE_SYSTEM_RIGHT_HANDED_Z_UP_X_FWD;
+                NODELET_INFO_STREAM(" * Camera coordinate system\t-> COORDINATE_SYSTEM_RIGHT_HANDED_Z_UP_X_FWD");
+                break;
+            case 1:
+                mZedParams.coordinate_system = sl::COORDINATE_SYSTEM_LEFT_HANDED_Z_UP;
+                NODELET_INFO_STREAM(" * Camera coordinate system\t-> COORDINATE_SYSTEM_LEFT_HANDED_Z_UP");
+                break;
+            case 2:
+                mZedParams.coordinate_system = sl::COORDINATE_SYSTEM_RIGHT_HANDED_Z_UP;
+                NODELET_INFO_STREAM(" * Camera coordinate system\t-> COORDINATE_SYSTEM_RIGHT_HANDED_Z_UP");
+                break;
+            case 3:
+                mZedParams.coordinate_system = sl::COORDINATE_SYSTEM_RIGHT_HANDED_Y_UP;
+                NODELET_INFO_STREAM(" * Camera coordinate system\t-> COORDINATE_SYSTEM_RIGHT_HANDED_Y_UP");
+                break;
+            case 4:
+                mZedParams.coordinate_system = sl::COORDINATE_SYSTEM_LEFT_HANDED_Y_UP;
+                NODELET_INFO_STREAM(" * Camera coordinate system\t-> COORDINATE_SYSTEM_LEFT_HANDED_Y_UP");
+                break;
+            case 5:
+                mZedParams.coordinate_system = sl::COORDINATE_SYSTEM_IMAGE;
+                NODELET_INFO_STREAM(" * Camera coordinate system\t-> COORDINATE_SYSTEM_IMAGE");
+                break;
+            default:
+                mZedParams.coordinate_system = sl::COORDINATE_SYSTEM_RIGHT_HANDED_Z_UP_X_FWD;
+                NODELET_INFO_STREAM(" * Camera coordinate system\t-> COORDINATE_SYSTEM_RIGHT_HANDED_Z_UP_X_FWD");
+        }
+
         mIdxX = 0;
         mIdxY = 1;
         mIdxZ = 2;
@@ -494,6 +524,8 @@ namespace zed_wrapper {
             NODELET_ERROR_STREAM("Camera model not valid: " << camera_model);
         }
 
+        mNhNs.getParam("general/coordinate_system", mCoordinateSystem); 
+
         // <---- General
 
         // ----> Video
@@ -641,6 +673,7 @@ namespace zed_wrapper {
         mNhNs.param<std::string>("general/left_camera_optical_frame", mLeftCamOptFrameId, "left_camera_optical_frame");
         mNhNs.param<std::string>("general/right_camera_frame", mRightCamFrameId, "right_camera_frame");
         mNhNs.param<std::string>("general/right_camera_optical_frame", mRightCamOptFrameId, "right_camera_optical_frame");
+        mNhNs.param<std::string>("general/coordinate_system", mCoordinateSystem, "right_camera_optical_frame");
         mDepthFrameId = mLeftCamFrameId;
         mDepthOptFrameId = mLeftCamOptFrameId;
 
