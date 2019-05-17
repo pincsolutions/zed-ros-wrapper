@@ -425,6 +425,7 @@ namespace zed_wrapper {
         sl::TRACKING_STATE mTrackingStatus;
         bool mImuPublishing = false;
         bool mPcPublishing = false;
+        int mCoordinateSystem = 0;
 
         int mMappingRes = 0;
         double mFusedPcPubFreq = 2.0;
