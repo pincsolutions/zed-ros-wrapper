@@ -673,7 +673,7 @@ namespace zed_wrapper {
         mNhNs.param<std::string>("general/left_camera_optical_frame", mLeftCamOptFrameId, "left_camera_optical_frame");
         mNhNs.param<std::string>("general/right_camera_frame", mRightCamFrameId, "right_camera_frame");
         mNhNs.param<std::string>("general/right_camera_optical_frame", mRightCamOptFrameId, "right_camera_optical_frame");
-        mNhNs.param<std::string>("general/coordinate_system", mCoordinateSystem, "right_camera_optical_frame");
+
         mDepthFrameId = mLeftCamFrameId;
         mDepthOptFrameId = mLeftCamOptFrameId;
 
