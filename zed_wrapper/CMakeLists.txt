@@ -173,3 +173,9 @@ install(DIRECTORY
   urdf
   param
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
+
+
+
+##Build - Jae added this
+add_executable(zed_depth_sub src/zed_depth.cpp)
+target_link_libraries(zed_depth_sub ${catkin_LIBRARIES})
