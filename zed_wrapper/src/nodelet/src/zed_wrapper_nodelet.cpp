@@ -1536,7 +1536,7 @@ namespace zed_wrapper {
         // Initialize Point Cloud message
         // https://github.com/ros/common_msgs/blob/jade-devel/sensor_msgs/include/sensor_msgs/point_cloud2_iterator.h
 
-        int ptsCount = mMatWidth * mMatHeight;
+        int ptsCount = int(mMatWidth/4) * int(mMatHeight/4);
 
         mPointcloudMsg->header.stamp = mPointCloudTime;
 
@@ -1546,8 +1546,8 @@ namespace zed_wrapper {
             mPointcloudMsg->is_bigendian = false;
             mPointcloudMsg->is_dense = false;
 
-            mPointcloudMsg->width = mMatWidth;
-            mPointcloudMsg->height = mMatHeight;
+            mPointcloudMsg->width = int(mMatWidth/4);
+            mPointcloudMsg->height = int(mMatHeight/4);
 
             sensor_msgs::PointCloud2Modifier modifier(*mPointcloudMsg);
             modifier.setPointCloud2Fields(4,
@@ -2450,7 +2450,8 @@ namespace zed_wrapper {
                     std::unique_lock<std::mutex> lock(mPcMutex, std::defer_lock);
 
                     if (lock.try_lock()) {
-                        mZed.retrieveMeasure(mCloud, sl::MEASURE_XYZBGRA, sl::MEM_CPU, mMatWidth, mMatHeight);
+                        //mZed.retrieveMeasure(mCloud, sl::MEASURE_XYZBGRA, sl::MEM_CPU, mMatWidth, mMatHeight);
+                        mZed.retrieveMeasure(mCloud, sl::MEASURE_XYZBGRA, sl::MEM_CPU, int(mMatWidth/4), int(mMatHeight/4));
 
                         mPointCloudFrameId = mDepthFrameId;
                         mPointCloudTime = mFrameTimestamp;
