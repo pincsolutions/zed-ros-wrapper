@@ -2451,7 +2451,7 @@ namespace zed_wrapper {
 
                     if (lock.try_lock()) {
                         //mZed.retrieveMeasure(mCloud, sl::MEASURE_XYZBGRA, sl::MEM_CPU, mMatWidth, mMatHeight);
-                        mZed.retrieveMeasure(mCloud, sl::MEASURE_XYZBGRA, sl::MEM_CPU, int(mMatWidth/4), int(mMatHeight/4));
+                        mZed.retrieveMeasure(mCloud, sl::MEASURE_XYZ, sl::MEM_CPU, int(mMatWidth/4), int(mMatHeight/4));
 
                         mPointCloudFrameId = mDepthFrameId;
                         mPointCloudTime = mFrameTimestamp;
