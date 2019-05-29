@@ -105,7 +105,8 @@ namespace zed_wrapper {
             depth_topic += "/depth_registered";
         }
 
-        string pointcloud_topic = mPointCloudTopicRoot + "/cloud_registered";
+        //string pointcloud_topic = mPointCloudTopicRoot + "/cloud_registered";
+        string pointcloud_topic = "/zed/point_cloud/cloud_registered";
         string pointcloud_fused_topic = mPointCloudTopicRoot + "/fused_cloud_registered";
 
         string conf_img_topic_name = "confidence_image";
@@ -1541,7 +1542,8 @@ namespace zed_wrapper {
         mPointcloudMsg->header.stamp = mPointCloudTime;
 
         if (mPointcloudMsg->width != mMatWidth || mPointcloudMsg->height != mMatHeight) {
-            mPointcloudMsg->header.frame_id = mPointCloudFrameId; // Set the header values of the ROS message
+            //mPointcloudMsg->header.frame_id = mPointCloudFrameId; // Set the header values of the ROS message
+            mPointcloudMsg->header.frame_id = "fcu";
 
             mPointcloudMsg->is_bigendian = false;
             mPointcloudMsg->is_dense = false;
