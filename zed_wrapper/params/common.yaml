@@ -47,9 +47,9 @@ depth:
 tracking:
     publish_tf:                 true                               # publish `odom -> base_link` TF
     publish_map_tf:             true                              # publish `map -> odom` TF
-    world_frame:                'world'                             # the reference fixed frame (same as `map_frame` or `odometry_frame`)
-    map_frame:                  'map'
-    odometry_frame:             'odom'
+    world_frame:                'zed_world'                             # the reference fixed frame (same as `map_frame` or `odometry_frame`)
+    map_frame:                  'zed_map'
+    odometry_frame:             'zed_odom'
     odometry_db:                ''
     spatial_memory:             false                                # Enable to detect loop closure
     floor_alignment:            false                               # Enable to automatically calculate camera/floor offset
