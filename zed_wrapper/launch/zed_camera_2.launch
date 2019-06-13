@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         </node>
     </group>
 
-    <node name="$(arg node_name)" pkg="zed_wrapper" type="zed_wrapper_node" output="screen" required="true"><!-- launch-prefix="valgrind" -->
+    <node name="$(arg node_name)" pkg="zed_wrapper" type="zed_wrapper_node" output="screen" required="false"><!-- launch-prefix="valgrind" -->
         <rosparam file="$(find zed_wrapper)/params/common_cam_2.yaml" command="load" />
         <rosparam file="$(find zed_wrapper)/params/zedm_2.yaml" command="load" />
 
