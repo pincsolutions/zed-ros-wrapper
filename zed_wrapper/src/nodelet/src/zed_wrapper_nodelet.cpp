@@ -397,7 +397,7 @@ namespace zed_wrapper {
         NODELET_INFO_STREAM("Advertised on topic " << mPubCloud.getTopic());
 
         // Pixel location subscriber
-        mSubPixelLocation = mNhNs.subscribe<std_msgs::String>(mPixelToPointcloudTopic, 10, boost::bind(&zed_wrapper::ZEDWrapperNodelet::pixelCallback, this, _1));
+        mSubPixelLocation = mNhNs.subscribe<std_msgs::String>("pixel_to_pointcloud", 10, boost::bind(&zed_wrapper::ZEDWrapperNodelet::pixelCallback, this, _1));
 
 #if ((ZED_SDK_MAJOR_VERSION>2) || (ZED_SDK_MAJOR_VERSION==2 && ZED_SDK_MINOR_VERSION>=8) )
 
@@ -529,8 +529,6 @@ namespace zed_wrapper {
         }
 
         mNhNs.getParam("general/coordinate_system", mCoordinateSystem); 
-        mNhNs.getParam<std::string>("general/pixel_sub_prefix", mPixelSubPrefix, "/zed");
-        mPixelToPointcloudTopic = mPixelSubPrefix + "/pixel_to_pointcloud";
 
         // <---- General
 
