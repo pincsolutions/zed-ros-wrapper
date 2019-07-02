@@ -156,7 +156,7 @@ namespace zed_wrapper {
 
         /* \brief Takes in a pixel location in x/y and finds corresponding location point cloud
          */
-        void pixelCallback(const geometry_msgs::PoseStamped&);
+        void pixelCallback(const geometry_msgs::PoseStamped::ConstPtr);
 
         /* \brief Publish a fused pointCloud with a ros Publisher
          */
