@@ -1531,7 +1531,15 @@ namespace zed_wrapper {
     //void ZEDWrapperNodelet::pixelCallback(const std_msgs::String::ConstPtr &message)
     void ZEDWrapperNodelet::pixelCallback(const geometry_msgs::PoseArray::ConstPtr &message)
     {
-        std::cout << "\n\nin callback\n\n";
+        for (auto pose : message.poses)
+        {
+            float4 point3d;
+            mCloud.getValue(pose.position.x, pose.position.y, point3d);
+            std::cout << "\nx: " << point3d.x 
+                      << "\ny: " << point3d.y
+                      << "\nz: " << point3d.z
+                      << std::endl;
+        }
     }
 
     void ZEDWrapperNodelet::publishPointCloud() {
