@@ -396,6 +396,9 @@ namespace zed_wrapper {
         mPubCloud = mNhNs.advertise<sensor_msgs::PointCloud2>(pointcloud_topic, 1);
         NODELET_INFO_STREAM("Advertised on topic " << mPubCloud.getTopic());
 
+        // Pixel location subscriber
+        mPubConfMap = mNhNs.subscribe("/zed/pixel_to_pointcloud", 1, &zed_wrapper::ZEDWrapperNodelet::pixelCallback, this);
+
 #if ((ZED_SDK_MAJOR_VERSION>2) || (ZED_SDK_MAJOR_VERSION==2 && ZED_SDK_MINOR_VERSION>=8) )
 
         if (mMappingEnabled) {
