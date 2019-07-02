@@ -154,6 +154,10 @@ namespace zed_wrapper {
          */
         void publishPointCloud();
 
+        /* \brief Takes in a pixel location in x/y and finds corresponding location point cloud
+         */
+        void pixelCallback(const geometry_msgs::PoseStamped&);
+
         /* \brief Publish a fused pointCloud with a ros Publisher
          */
         void pubFusedPointCloudCallback(const ros::TimerEvent& e);
@@ -328,6 +332,8 @@ namespace zed_wrapper {
         ros::Publisher mPubMapPath;
         ros::Publisher mPubImu;
         ros::Publisher mPubImuRaw;
+
+        ros::Subscriber mSubPixelLocation;
 
         // Timers
         ros::Timer mImuTimer;
