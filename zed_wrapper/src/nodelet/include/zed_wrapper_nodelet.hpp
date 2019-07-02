@@ -38,6 +38,7 @@
 #include <dynamic_reconfigure/server.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <geometry_msgs/PoseArray.h>
+#include <geometry_msgs/Pose.h>
 #include <sensor_msgs/PointCloud2.h>
 #include <diagnostic_updater/diagnostic_updater.h>
 

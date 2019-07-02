@@ -1529,15 +1529,25 @@ namespace zed_wrapper {
  
     void ZEDWrapperNodelet::pixelCallback(const geometry_msgs::PoseArray::ConstPtr &message)
     {
-        for (auto pose : message->poses)
+        std::unique_lock<std::mutex> lock(mPcMutex, std::defer_lock);
+        if (lock.try_lock()) 
         {
-            sl::float4 point3d;
-            mCloud.getValue(size_t(int(pose.position.x)), size_t(int(pose.position.y)), &point3d);
-            std::cout << "\nx: " << point3d.x 
-                      << "\ny: " << point3d.y
-                      << "\nz: " << point3d.z
-                      << std::endl;
-       }
+            sl::float point3d;
+            geometry_msgs::PoseArray pc_poses;
+
+            for (auto pose : message->poses)
+            {
+                geometry_msgs::Pose local_pose;
+                mCloud.getValue(size_t(int(pose.position.x)), size_t(int(pose.position.y)), &point3d);
+                local_pose.position.x = point3d.x;
+                local_pose.position.y = point3d.y;
+                local_pose.position.z = point3d.z;
+                pc_poses.poses.push_back(local_pose);
+            }
+
+            pc_poses.header.stamp = ros::Time::now();
+            // publish
+        }
     }
 
     void ZEDWrapperNodelet::publishPointCloud() {
