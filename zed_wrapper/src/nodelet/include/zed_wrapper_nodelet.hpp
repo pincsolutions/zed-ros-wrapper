@@ -433,6 +433,7 @@ namespace zed_wrapper {
         bool mImuPublishing = false;
         bool mPcPublishing = false;
         int mCoordinateSystem = 0;
+        std::string mPixelSubPrefix;
 
         int mMappingRes = 0;
         double mFusedPcPubFreq = 2.0;
@@ -449,6 +450,7 @@ namespace zed_wrapper {
         std::string mOdometryTopic;
         std::string mImuTopicRoot;
         std::string mStereoTopicRoot;
+        std::string mPixelToPointcloudTopic;
 
         // Last frame time
         ros::Time mPrevFrameTimestamp;
