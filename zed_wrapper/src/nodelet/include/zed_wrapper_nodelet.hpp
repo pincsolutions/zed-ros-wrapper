@@ -334,8 +334,9 @@ namespace zed_wrapper {
         ros::Publisher mPubMapPath;
         ros::Publisher mPubImu;
         ros::Publisher mPubImuRaw;
+        ros::Publisher mPubPixelToPcLoc;
 
-        ros::Subscriber mSubPixelLocation;
+        ros::Subscriber mSubPixelToPcInquiry;
 
         // Timers
         ros::Timer mImuTimer;

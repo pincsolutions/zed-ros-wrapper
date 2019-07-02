@@ -396,8 +396,9 @@ namespace zed_wrapper {
         mPubCloud = mNhNs.advertise<sensor_msgs::PointCloud2>(pointcloud_topic, 1);
         NODELET_INFO_STREAM("Advertised on topic " << mPubCloud.getTopic());
 
+        mPubPixelToPcLoc = mNhNs.advertise<geometry_msgs::PoseArray>('pixel_to_pc_location', 1);
         // Pixel location subscriber
-        mSubPixelLocation = mNhNs.subscribe<geometry_msgs::PoseArray>("pixel_to_pointcloud", 10, boost::bind(&zed_wrapper::ZEDWrapperNodelet::pixelCallback, this, _1));
+        mSubPixelToPcInquiry = mNhNs.subscribe<geometry_msgs::PoseArray>("pixel_to_pointcloud", 10, boost::bind(&zed_wrapper::ZEDWrapperNodelet::pixelCallback, this, _1));
 
 #if ((ZED_SDK_MAJOR_VERSION>2) || (ZED_SDK_MAJOR_VERSION==2 && ZED_SDK_MINOR_VERSION>=8) )
 
@@ -1532,7 +1533,7 @@ namespace zed_wrapper {
         std::unique_lock<std::mutex> lock(mPcMutex, std::defer_lock);
         if (lock.try_lock()) 
         {
-            sl::float point3d;
+            sl::float4 point3d;
             geometry_msgs::PoseArray pc_poses;
 
             for (auto pose : message->poses)
@@ -1547,6 +1548,7 @@ namespace zed_wrapper {
 
             pc_poses.header.stamp = ros::Time::now();
             // publish
+            mPubPixelToPcLoc.publish(pc_poses);
         }
     }
 
