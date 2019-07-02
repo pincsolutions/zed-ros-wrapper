@@ -38,6 +38,7 @@
 #include <dynamic_reconfigure/server.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <sensor_msgs/PointCloud2.h>
+#include <std_msgs/String.h>
 #include <diagnostic_updater/diagnostic_updater.h>
 
 // Dynamic reconfiguration
@@ -156,7 +157,7 @@ namespace zed_wrapper {
 
         /* \brief Takes in a pixel location in x/y and finds corresponding location point cloud
          */
-        void pixelCallback(const geometry_msgs::PoseStamped::ConstPtr);
+        void pixelCallback(const std_msgs::String::ConstPtr& message);
 
         /* \brief Publish a fused pointCloud with a ros Publisher
          */

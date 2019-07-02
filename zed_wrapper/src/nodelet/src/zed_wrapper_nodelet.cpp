@@ -1,4 +1,4 @@
-///////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
 //
 // Copyright (c) 2018, STEREOLABS.
 //
@@ -397,7 +397,7 @@ namespace zed_wrapper {
         NODELET_INFO_STREAM("Advertised on topic " << mPubCloud.getTopic());
 
         // Pixel location subscriber
-        mSubPixelLocation = mNhNs.subscribe("/zed/pixel_to_pointcloud", 10, boost::bind(& zed_wrapper::ZEDWrapperNodelet::pixelCallback, this, _1));
+        mSubPixelLocation = mNhNs.subscribe<std_msgs::String>("/zed/pixel_to_pointcloud", 10, boost::bind(&zed_wrapper::ZEDWrapperNodelet::pixelCallback, this, _1));
 
 #if ((ZED_SDK_MAJOR_VERSION>2) || (ZED_SDK_MAJOR_VERSION==2 && ZED_SDK_MINOR_VERSION>=8) )
 
@@ -1527,7 +1527,7 @@ namespace zed_wrapper {
         NODELET_DEBUG("Pointcloud thread finished");
     }
 
-    void ZEDWrapperNodelet::pixelCallback(const geometry_msgs::Pose::ConstPtr msg)
+    void ZEDWrapperNodelet::pixelCallback(const std_msgs::String::ConstPtr &message)
     {
         std::cout << "\n\nin callback\n\n";
     }
