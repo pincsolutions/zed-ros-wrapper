@@ -37,6 +37,7 @@
 #include <image_transport/image_transport.h>
 #include <dynamic_reconfigure/server.h>
 #include <geometry_msgs/PoseStamped.h>
+#include <geometry_msgs/PoseArray.h>
 #include <sensor_msgs/PointCloud2.h>
 #include <std_msgs/String.h>
 #include <diagnostic_updater/diagnostic_updater.h>
@@ -157,7 +158,8 @@ namespace zed_wrapper {
 
         /* \brief Takes in a pixel location in x/y and finds corresponding location point cloud
          */
-        void pixelCallback(const std_msgs::String::ConstPtr& message);
+        //void pixelCallback(const std_msgs::String::ConstPtr& message);
+        void pixelCallback(const geometry_msgs::PoseArray::ConstPtr& message);
 
         /* \brief Publish a fused pointCloud with a ros Publisher
          */
