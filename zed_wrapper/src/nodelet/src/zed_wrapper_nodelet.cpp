@@ -31,12 +31,32 @@
 #include <sensor_msgs/image_encodings.h>
 #include <sensor_msgs/point_cloud2_iterator.h>
 #include <stereo_msgs/DisparityImage.h>
+#include <std_msgs/Float64MultiArray.h>
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
-
+#include <cmath>
 #include <chrono>
 
 using namespace std;
+
+std::vector<double> mean_var_dev(const std::vector<double> &val) 
+{
+    double sum = 0.0, mean, variance = 0.0, stdDeviation;
+
+    for(int i = 0; i < val.size(); ++i)
+    {
+        sum += val[i];
+    }
+    mean = sum/val.size();
+    for(int i = 0; i < val.size(); ++i)
+    {
+        variance += pow(val[i] - mean, 2);
+    }
+    variance=variance/val.size();
+    stdDeviation = sqrt(variance);
+    std::vector<double> m_var_dev = {mean, variance, stdDeviation};
+    return m_var_dev;
+}
 
 namespace zed_wrapper {
 
@@ -397,7 +417,7 @@ namespace zed_wrapper {
         NODELET_INFO_STREAM("Advertised on topic " << mPubCloud.getTopic());
 
         // initialize pixel to pointcloud subscriber and publisher/pixel
-        mPubPixelToPcLoc = mNhNs.advertise<geometry_msgs::PoseArray>("pixel_to_pc_location", 1);
+        mPubPixelToPcLoc = mNhNs.advertise<std_msgs::Float64MultiArray>("pixel_to_pc_location", 1);
         mSubPixelToPcInquiry = mNhNs.subscribe<geometry_msgs::PoseArray>("pixel_to_pc_inquiry", 10, boost::bind(&zed_wrapper::ZEDWrapperNodelet::pixelCallback, this, _1));
 
 #if ((ZED_SDK_MAJOR_VERSION>2) || (ZED_SDK_MAJOR_VERSION==2 && ZED_SDK_MINOR_VERSION>=8) )
@@ -1534,19 +1554,35 @@ namespace zed_wrapper {
         if (lock.try_lock()) 
         {
             sl::float4 point3d;
-            geometry_msgs::PoseArray pc_poses;
-
+            std::vector<double> x_pts;
+            std::vector<double> y_pts;
+            std::vector<double> z_pts;
             for (auto pose : message->poses)
             {
-                geometry_msgs::Pose local_pose;
-                mCloud.getValue(size_t(int(pose.position.x)), size_t(int(pose.position.y)), &point3d);
-                local_pose.position.x = point3d.x;
-                local_pose.position.y = point3d.y;
-                local_pose.position.z = point3d.z;
-                pc_poses.poses.push_back(local_pose);
+                mCloud.getValue(size_t(int(pose.position.y)), size_t(int(pose.position.x)), &point3d);
+                if (!isnan(point3d.x) && !isnan(point3d.y) && !isnan(point3d.z))
+                {
+                    x_pts.push_back(point3d.x);
+                    y_pts.push_back(point3d.y);
+                    z_pts.push_back(point3d.z);
+                }
             }
+            std::vector<double> x_mvd = mean_var_dev(x_pts);
+            std::vector<double> y_mvd = mean_var_dev(y_pts);
+            std::vector<double> z_mvd = mean_var_dev(z_pts);
 
-            pc_poses.header.stamp = ros::Time::now();
+            // construct ros message
+            std_msgs::Float64MultiArray output_msg;
+            output_msg.data.push_back(x_mvd[0]);
+            output_msg.data.push_back(x_mvd[1]);
+            output_msg.data.push_back(x_mvd[2]);
+            output_msg.data.push_back(y_mvd[0]);
+            output_msg.data.push_back(y_mvd[1]);
+            output_msg.data.push_back(y_mvd[2]);
+            output_msg.data.push_back(z_mvd[0]);
+            output_msg.data.push_back(z_mvd[1]);
+            output_msg.data.push_back(z_mvd[2]);
+
             // publish
             mPubPixelToPcLoc.publish(pc_poses);
         }
