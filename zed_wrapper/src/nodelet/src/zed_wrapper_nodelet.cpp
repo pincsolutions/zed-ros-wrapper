@@ -418,7 +418,7 @@ namespace zed_wrapper {
 
         // initialize pixel to pointcloud subscriber and publisher/pixel
         mPubPixelToPcLoc = mNhNs.advertise<std_msgs::Float64MultiArray>("pixel_to_pc_location", 1);
-        mSubPixelToPcInquiry = mNhNs.subscribe<geometry_msgs::PoseArray>("pixel_to_pc_inquiry", 10, boost::bind(&zed_wrapper::ZEDWrapperNodelet::pixelCallback, this, _1));
+        mSubPixelToPcInquiry = mNhNs.subscribe<geometry_msgs::PoseArray>("pixel_to_pc_inquiry", 1, boost::bind(&zed_wrapper::ZEDWrapperNodelet::pixelCallback, this, _1));
 
 #if ((ZED_SDK_MAJOR_VERSION>2) || (ZED_SDK_MAJOR_VERSION==2 && ZED_SDK_MINOR_VERSION>=8) )
 
@@ -2516,8 +2516,8 @@ namespace zed_wrapper {
                     std::unique_lock<std::mutex> lock(mPcMutex, std::defer_lock);
 
                     if (lock.try_lock()) {
-                        //mZed.retrieveMeasure(mCloud, sl::MEASURE_XYZBGRA, sl::MEM_CPU, mMatWidth, mMatHeight);
-                        mZed.retrieveMeasure(mCloud, sl::MEASURE_XYZBGRA, sl::MEM_CPU, int(mMatWidth/4), int(mMatHeight/4));
+                        mZed.retrieveMeasure(mCloud, sl::MEASURE_XYZBGRA, sl::MEM_CPU, mMatWidth, mMatHeight);
+                        //mZed.retrieveMeasure(mCloud, sl::MEASURE_XYZBGRA, sl::MEM_CPU, int(mMatWidth/4), int(mMatHeight/4));
 
                         mPointCloudFrameId = mDepthFrameId;
                         mPointCloudTime = mFrameTimestamp;
