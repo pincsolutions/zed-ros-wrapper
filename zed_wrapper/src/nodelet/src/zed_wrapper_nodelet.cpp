@@ -1584,7 +1584,7 @@ namespace zed_wrapper {
             output_msg.data.push_back(z_mvd[2]);
 
             // publish
-            mPubPixelToPcLoc.publish(pc_poses);
+            mPubPixelToPcLoc.publish(output_msg);
         }
     }
 
