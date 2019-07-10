@@ -1206,6 +1206,7 @@ namespace zed_wrapper {
         trackParams.enable_pose_smoothing = mPoseSmoothing; // Always false. To be enabled only for VR/AR applications
         trackParams.enable_spatial_memory = mSpatialMemory;
         trackParams.initial_world_transform = mInitialPoseSl;
+        trackParams.enable_imu_fusion = false;
 
 #if ((ZED_SDK_MAJOR_VERSION>2) || (ZED_SDK_MAJOR_VERSION==2 && ZED_SDK_MINOR_VERSION>=6))
         trackParams.set_floor_as_origin = mFloorAlignment;
