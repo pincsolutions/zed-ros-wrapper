@@ -229,6 +229,7 @@ namespace zed_wrapper {
         {
             case 0:
                 mZedParams.coordinate_system = sl::COORDINATE_SYSTEM_RIGHT_HANDED_Z_UP_X_FWD;
+                mZedParams.camera_disable_imu = true;
                 NODELET_INFO_STREAM(" * Camera coordinate system\t-> COORDINATE_SYSTEM_RIGHT_HANDED_Z_UP_X_FWD");
                 break;
             case 1:
