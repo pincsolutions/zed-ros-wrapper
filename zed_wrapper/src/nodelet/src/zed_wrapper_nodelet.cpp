@@ -530,7 +530,7 @@ namespace zed_wrapper {
 
         mNhNs.getParam("general/coordinate_system", mCoordinateSystem); 
         mNhNs.getParam("general/camera_disable_imu", mDisableCameraImu);
-        NODELET_INFO_STREAM(" * Enable Cam IMU\t\t-> " << (mEnableCameraImu ? "DISABLED" : "ENABLED"));
+        NODELET_INFO_STREAM(" * Enable Cam IMU\t\t-> " << (mDisableCameraImu ? "DISABLED" : "ENABLED"));
         
 
         // <---- General
