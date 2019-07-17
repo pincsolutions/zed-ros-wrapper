@@ -494,6 +494,8 @@ namespace zed_wrapper {
         bool mOpenniDepthMode; // 16 bit UC data in mm else 32F in m, for more info -> http://www.ros.org/reps/rep-0118.html
         bool mPoseSmoothing = false; // Always disabled. Enable only for AR/VR applications
         bool mSpatialMemory;
+        bool mEnableImuFusion;
+        bool mEnableCameraImu;
         bool mInitOdomWithPose;
         bool mResetOdom = false;
         bool mPublishPoseCovariance = true;

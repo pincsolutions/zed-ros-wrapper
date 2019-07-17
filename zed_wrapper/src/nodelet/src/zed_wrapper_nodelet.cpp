@@ -229,7 +229,6 @@ namespace zed_wrapper {
         {
             case 0:
                 mZedParams.coordinate_system = sl::COORDINATE_SYSTEM_RIGHT_HANDED_Z_UP_X_FWD;
-                mZedParams.camera_disable_imu = true;
                 NODELET_INFO_STREAM(" * Camera coordinate system\t-> COORDINATE_SYSTEM_RIGHT_HANDED_Z_UP_X_FWD");
                 break;
             case 1:
@@ -256,6 +255,9 @@ namespace zed_wrapper {
                 mZedParams.coordinate_system = sl::COORDINATE_SYSTEM_RIGHT_HANDED_Z_UP_X_FWD;
                 NODELET_INFO_STREAM(" * Camera coordinate system\t-> COORDINATE_SYSTEM_RIGHT_HANDED_Z_UP_X_FWD");
         }
+
+        // enable/disable camera imu
+        mZedParams.camera_disable_imu = mEnableCameraImu;
 
         mIdxX = 0;
         mIdxY = 1;
@@ -527,6 +529,9 @@ namespace zed_wrapper {
         }
 
         mNhNs.getParam("general/coordinate_system", mCoordinateSystem); 
+        mNhNs.getParam("general/camera_disable_imu", mEnableCameraImu);
+        NODELET_INFO_STREAM(" * Enable Cam IMU\t\t-> " << (mEnableCameraImu ? "ENABLED" : "DISABLED"));
+        
 
         // <---- General
 
@@ -585,6 +590,9 @@ namespace zed_wrapper {
         mNhNs.getParam("tracking/two_d_mode", mTwoDMode);
         NODELET_INFO_STREAM(" * Two D mode\t\t\t-> " << (mTwoDMode ? "ENABLED" : "DISABLED"));
         mNhNs.getParam("tracking/fixed_z_value", mFixedZValue);
+        mNhNs.getParam("tracking/enable_imu_fusion", mEnableImuFusion);
+        NODELET_INFO_STREAM(" * Enable IMU Fusion\t\t-> " << (mEnableImuFusion ? "ENABLED" : "DISABLED"));
+
 
         if (mTwoDMode) {
             NODELET_INFO_STREAM(" * Fixed Z value\t\t-> " << mFixedZValue);
@@ -1207,7 +1215,7 @@ namespace zed_wrapper {
         trackParams.enable_pose_smoothing = mPoseSmoothing; // Always false. To be enabled only for VR/AR applications
         trackParams.enable_spatial_memory = mSpatialMemory;
         trackParams.initial_world_transform = mInitialPoseSl;
-        trackParams.enable_imu_fusion = false;
+        trackParams.enable_imu_fusion = mEnableImuFusion;
 
 #if ((ZED_SDK_MAJOR_VERSION>2) || (ZED_SDK_MAJOR_VERSION==2 && ZED_SDK_MINOR_VERSION>=6))
         trackParams.set_floor_as_origin = mFloorAlignment;
