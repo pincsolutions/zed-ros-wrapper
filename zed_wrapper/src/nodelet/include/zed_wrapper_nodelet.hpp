@@ -495,7 +495,7 @@ namespace zed_wrapper {
         bool mPoseSmoothing = false; // Always disabled. Enable only for AR/VR applications
         bool mSpatialMemory;
         bool mEnableImuFusion;
-        bool mEnableCameraImu;
+        bool mDisableCameraImu;
         bool mInitOdomWithPose;
         bool mResetOdom = false;
         bool mPublishPoseCovariance = true;

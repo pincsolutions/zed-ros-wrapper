@@ -257,7 +257,7 @@ namespace zed_wrapper {
         }
 
         // enable/disable camera imu
-        mZedParams.camera_disable_imu = mEnableCameraImu;
+        mZedParams.camera_disable_imu = mDisableCameraImu;
 
         mIdxX = 0;
         mIdxY = 1;
@@ -529,8 +529,8 @@ namespace zed_wrapper {
         }
 
         mNhNs.getParam("general/coordinate_system", mCoordinateSystem); 
-        mNhNs.getParam("general/camera_disable_imu", mEnableCameraImu);
-        NODELET_INFO_STREAM(" * Enable Cam IMU\t\t-> " << (mEnableCameraImu ? "ENABLED" : "DISABLED"));
+        mNhNs.getParam("general/camera_disable_imu", mDisableCameraImu);
+        NODELET_INFO_STREAM(" * Enable Cam IMU\t\t-> " << (mEnableCameraImu ? "DISABLED" : "ENABLED"));
         
 
         // <---- General
