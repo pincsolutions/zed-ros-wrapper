@@ -1593,6 +1593,11 @@ namespace zed_wrapper {
             output_msg.data.push_back(z_mvd[1]);
             output_msg.data.push_back(z_mvd[2]);
 
+            std::stringstream ss;
+            ss << "y mean: " << y_mvd[0]
+               << "\ny var:  " << y_mvd[1] << "\n\n";
+            ROS_INFO("%s", ss.str().c_str());
+
             // publish
             mPubPixelToPcLoc.publish(output_msg);
         }
