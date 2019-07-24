@@ -156,9 +156,15 @@ namespace zed_wrapper {
          */
         void publishPointCloud();
 
-        /* \brief Takes in a pixel location in x/y and finds corresponding location point cloud
+        /* \brief Takes in a pixel location and finds corresponding location point cloud.
+                  Used in correcting y drift externally.
          */
-        void pixelCallback(const geometry_msgs::PoseArray::ConstPtr& message);
+        void yPixelCallback(const geometry_msgs::PoseArray::ConstPtr& message);
+
+         /* \brief Takes in a pixel location and finds corresponding location point cloud.
+                    Used in corrected x drift, externally.
+         */
+        void xPixelCallback(const geometry_msgs::PoseArray::ConstPtr& message);
 
         /* \brief Publish a fused pointCloud with a ros Publisher
          */
@@ -334,9 +340,11 @@ namespace zed_wrapper {
         ros::Publisher mPubMapPath;
         ros::Publisher mPubImu;
         ros::Publisher mPubImuRaw;
-        ros::Publisher mPubPixelToPcLoc;
+        ros::Publisher mPubYPixelToPcLoc;
+        ros::Publisher mPubXPixelToPcLoc;
 
-        ros::Subscriber mSubPixelToPcInquiry;
+        ros::Subscriber mSubYPixelToPcInquiry;
+        ros::Subscriber mSubXPixelToPcInquiry;
 
         // Timers
         ros::Timer mImuTimer;

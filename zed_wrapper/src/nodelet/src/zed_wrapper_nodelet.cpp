@@ -420,8 +420,10 @@ namespace zed_wrapper {
         NODELET_INFO_STREAM("Advertised on topic " << mPubCloud.getTopic());
 
         // initialize pixel to pointcloud subscriber and publisher/pixel
-        mPubPixelToPcLoc = mNhNs.advertise<std_msgs::Float64MultiArray>("pixel_to_pc_location", 1);
-        mSubPixelToPcInquiry = mNhNs.subscribe<geometry_msgs::PoseArray>("pixel_to_pc_inquiry", 1, boost::bind(&zed_wrapper::ZEDWrapperNodelet::pixelCallback, this, _1));
+        mPubYPixelToPcLoc = mNhNs.advertise<std_msgs::Float64MultiArray>("y_pixel_to_pc_location", 1);
+        mPubXPixelToPcLoc = mNhNs.advertise<std_msgs::Float64MultiArray>("x_pixel_to_pc_location", 1);
+        mSubYPixelToPcInquiry = mNhNs.subscribe<geometry_msgs::PoseArray>("y_pixel_to_pc_inquiry", 1, boost::bind(&zed_wrapper::ZEDWrapperNodelet::yPixelCallback, this, _1));
+        mSubXPixelToPcInquiry = mNhNs.subscribe<geometry_msgs::PoseArray>("x_pixel_to_pc_inquiry", 1, boost::bind(&zed_wrapper::ZEDWrapperNodelet::xPixelCallback, this, _1));
 
 #if ((ZED_SDK_MAJOR_VERSION>2) || (ZED_SDK_MAJOR_VERSION==2 && ZED_SDK_MINOR_VERSION>=8) )
 
@@ -1558,7 +1560,7 @@ namespace zed_wrapper {
         NODELET_DEBUG("Pointcloud thread finished");
     }
  
-    void ZEDWrapperNodelet::pixelCallback(const geometry_msgs::PoseArray::ConstPtr &message)
+    void ZEDWrapperNodelet::yPixelCallback(const geometry_msgs::PoseArray::ConstPtr &message)
     {
         //std::unique_lock<std::mutex> lock(mPcMutex, std::defer_lock);
         //if (lock.try_lock()) 
@@ -1594,12 +1596,57 @@ namespace zed_wrapper {
             output_msg.data.push_back(z_mvd[2]);
 
             std::stringstream ss;
-            ss << "y mean: " << y_mvd[0]
-               << "\ny var:  " << y_mvd[1] << "\n\n";
+            ss <<"y_callback:\nmean:   " << y_mvd[0]
+               << "\nvar:   " << y_mvd[1] << "\n\n";
             ROS_INFO("%s", ss.str().c_str());
 
             // publish
-            mPubPixelToPcLoc.publish(output_msg);
+            mPubYPixelToPcLoc.publish(output_msg);
+        //}
+    }
+
+    void ZEDWrapperNodelet::xPixelCallback(const geometry_msgs::PoseArray::ConstPtr &message)
+    {
+        //std::unique_lock<std::mutex> lock(mPcMutex, std::defer_lock);
+        //if (lock.try_lock()) 
+        //{
+            sl::float4 point3d;
+            std::vector<double> x_pts;
+            std::vector<double> y_pts;
+            std::vector<double> z_pts;
+            for (auto pose : message->poses)
+            {
+                mCloud.getValue(size_t(int(pose.position.y)), size_t(int(pose.position.x)), &point3d);
+                if (!isnan(point3d.x) && !isnan(point3d.y) && !isnan(point3d.z))
+                {
+                    x_pts.push_back(point3d.x);
+                    y_pts.push_back(point3d.y);
+                    z_pts.push_back(point3d.z);
+                }
+            }
+            std::vector<double> x_mvd = mean_var_dev(x_pts);
+            std::vector<double> y_mvd = mean_var_dev(y_pts);
+            std::vector<double> z_mvd = mean_var_dev(z_pts);
+
+            // construct ros message
+            std_msgs::Float64MultiArray output_msg;
+            output_msg.data.push_back(x_mvd[0]);
+            output_msg.data.push_back(x_mvd[1]);
+            output_msg.data.push_back(x_mvd[2]);
+            output_msg.data.push_back(y_mvd[0]);
+            output_msg.data.push_back(y_mvd[1]);
+            output_msg.data.push_back(y_mvd[2]);
+            output_msg.data.push_back(z_mvd[0]);
+            output_msg.data.push_back(z_mvd[1]);
+            output_msg.data.push_back(z_mvd[2]);
+
+            std::stringstream ss;
+            ss << "x_callback:\nmean:   " << y_mvd[0]
+               << "\nvar:   " << y_mvd[1] << "\n\n";
+            ROS_INFO("%s", ss.str().c_str());
+
+            // publish
+            mPubXPixelToPcLoc.publish(output_msg);
         //}
     }
 
@@ -2523,7 +2570,10 @@ namespace zed_wrapper {
                 }
 
                 // Publish the point cloud if someone has subscribed to
-                if (cloudSubnumber > 0) {
+                //if (cloudSubnumber > 0) {
+                if (true) {
+                    // need the zed to continually retrieve pointcloud data, even though sub number is 0. 
+                    // external nodes depend on quirying the data. cannot be static.
 
                     // Run the point cloud conversion asynchronously to avoid slowing down
                     // all the program
@@ -2537,10 +2587,12 @@ namespace zed_wrapper {
                         mPointCloudFrameId = mDepthFrameId;
                         mPointCloudTime = mFrameTimestamp;
 
-                        // Signal Pointcloud thread that a new pointcloud is ready
-                        mPcDataReadyCondVar.notify_one();
-                        mPcDataReady = true;
-                        mPcPublishing = true;
+                        if (cloudSubnumber > 0) {
+                            // Signal Pointcloud thread that a new pointcloud is ready
+                            mPcDataReadyCondVar.notify_one();
+                            mPcDataReady = true;
+                            mPcPublishing = true;
+                        }
                     }
                 } else {
                     mPcPublishing = false;
