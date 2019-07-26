@@ -1630,7 +1630,7 @@ namespace zed_wrapper {
 
             // construct ros message
             std_msgs::Float64MultiArray output_msg;
-            output_msg.header.seq = message.header.seq;
+            output_msg.layout.data_offset = message.header.seq;
             output_msg.data.push_back(x_mvd[0]);
             output_msg.data.push_back(x_mvd[1]);
             output_msg.data.push_back(x_mvd[2]);
