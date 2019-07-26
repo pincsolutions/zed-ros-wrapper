@@ -1614,9 +1614,10 @@ namespace zed_wrapper {
             std::vector<double> x_pts;
             std::vector<double> y_pts;
             std::vector<double> z_pts;
-            for (auto pose : message->poses)
+            //for (auto pose : message->poses)
+            for (int i = 1; i < message->poses.size(); i++)
             {
-                mCloud.getValue(size_t(int(pose.position.y)), size_t(int(pose.position.x)), &point3d);
+                mCloud.getValue(size_t(int(message->poses[i].position.y)), size_t(int(message->poses[i].position.x)), &point3d);
                 if (!isnan(point3d.x) && !isnan(point3d.y) && !isnan(point3d.z))
                 {
                     x_pts.push_back(point3d.x);
@@ -1630,7 +1631,7 @@ namespace zed_wrapper {
 
             // construct ros message
             std_msgs::Float64MultiArray output_msg;
-            output_msg.layout.data_offset = message.header.seq;
+            output_msg.data.push_back(message->poses[0].position.x)
             output_msg.data.push_back(x_mvd[0]);
             output_msg.data.push_back(x_mvd[1]);
             output_msg.data.push_back(x_mvd[2]);
