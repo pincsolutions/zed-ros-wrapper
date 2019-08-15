@@ -2599,7 +2599,7 @@ namespace zed_wrapper {
                             while (clouds.size() > 10)
                                 clouds.pop_back();
                         }
-                        clouds.push_back(std::make_pair(mFrameTimeStamp, mCloud));
+                        clouds.push_back(std::make_pair(mFrameTimestamp, mCloud));
                         
                         if (cloudSubnumber > 0)
                         {
