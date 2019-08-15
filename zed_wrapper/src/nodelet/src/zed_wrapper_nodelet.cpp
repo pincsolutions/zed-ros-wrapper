@@ -1591,7 +1591,7 @@ namespace zed_wrapper {
                 for (auto pose : message->poses)
                 {
                     //mCloud.getValue(size_t(int(pose.position.y)), size_t(int(pose.position.x)), &point3d);
-                    clouds[ind].second.getValue(size_t(int(message->poses[i].position.y)), size_t(int(message->poses[i].position.x)), &point3d);
+                    clouds[ind].second.getValue(size_t(int(pose.position.y)), size_t(int(pose.position.x)), &point3d);
                     if (!isnan(point3d.x) && !isnan(point3d.y) && !isnan(point3d.z))
                     {
                         x_pts.push_back(point3d.x);
