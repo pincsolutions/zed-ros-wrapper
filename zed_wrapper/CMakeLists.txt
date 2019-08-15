@@ -51,6 +51,7 @@ find_package(catkin COMPONENTS
   message_generation
   diagnostic_updater
   roslint
+  aisle_keeper
 )
 
 checkPackage("image_transport" "")
@@ -93,6 +94,7 @@ catkin_package(
     tf2_ros
     tf2_geometry_msgs
     message_runtime
+    aisle_keeper
 )
 
 ###############################################################################
