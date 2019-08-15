@@ -1569,43 +1569,60 @@ namespace zed_wrapper {
         //std::unique_lock<std::mutex> lock(mPcMutex, std::defer_lock);
         //if (lock.try_lock()) 
         //{
-            sl::float4 point3d;
-            std::vector<double> x_pts;
-            std::vector<double> y_pts;
-            std::vector<double> z_pts;
-            for (auto pose : message->poses)
+
+            int ind = 0;
+            bool cloudFound = false;
+
+            for (; ind < clouds.size(); ind++)
             {
-                mCloud.getValue(size_t(int(pose.position.y)), size_t(int(pose.position.x)), &point3d);
-                if (!isnan(point3d.x) && !isnan(point3d.y) && !isnan(point3d.z))
+                if ((message->imageStamp.data.sec == clouds[ind].first.sec) && (message->imageStamp.data.nsec == clouds[ind].first.nsec))
                 {
-                    x_pts.push_back(point3d.x);
-                    y_pts.push_back(point3d.y);
-                    z_pts.push_back(point3d.z);
+                    cloudFound = true;
+                    break;
                 }
             }
-            std::vector<double> x_mvd = mean_var_dev(x_pts);
-            std::vector<double> y_mvd = mean_var_dev(y_pts);
-            std::vector<double> z_mvd = mean_var_dev(z_pts);
 
-            // construct ros message
-            std_msgs::Float64MultiArray output_msg;
-            output_msg.data.push_back(x_mvd[0]);
-            output_msg.data.push_back(x_mvd[1]);
-            output_msg.data.push_back(x_mvd[2]);
-            output_msg.data.push_back(y_mvd[0]);
-            output_msg.data.push_back(y_mvd[1]);
-            output_msg.data.push_back(y_mvd[2]);
-            output_msg.data.push_back(z_mvd[0]);
-            output_msg.data.push_back(z_mvd[1]);
-            output_msg.data.push_back(z_mvd[2]);
+            if (cloudFound)
+            {
+                sl::float4 point3d;
+                std::vector<double> x_pts;
+                std::vector<double> y_pts;
+                std::vector<double> z_pts;
+                for (auto pose : message->poses)
+                {
+                    //mCloud.getValue(size_t(int(pose.position.y)), size_t(int(pose.position.x)), &point3d);
+                    clouds[ind].second.getValue(size_t(int(message->poses[i].position.y)), size_t(int(message->poses[i].position.x)), &point3d);
+                    if (!isnan(point3d.x) && !isnan(point3d.y) && !isnan(point3d.z))
+                    {
+                        x_pts.push_back(point3d.x);
+                        y_pts.push_back(point3d.y);
+                        z_pts.push_back(point3d.z);
+                    }
+                }
+                std::vector<double> x_mvd = mean_var_dev(x_pts);
+                std::vector<double> y_mvd = mean_var_dev(y_pts);
+                std::vector<double> z_mvd = mean_var_dev(z_pts);
 
-            std::stringstream ss;
-            ss <<"y_callback:\nmean:   " << y_mvd[0]
-               << "\nvar:   " << y_mvd[1] << "\n\n";
-            ROS_INFO("%s", ss.str().c_str());
+                // construct ros message
+                std_msgs::Float64MultiArray output_msg;
+                output_msg.data.push_back(x_mvd[0]);
+                output_msg.data.push_back(x_mvd[1]);
+                output_msg.data.push_back(x_mvd[2]);
+                output_msg.data.push_back(y_mvd[0]);
+                output_msg.data.push_back(y_mvd[1]);
+                output_msg.data.push_back(y_mvd[2]);
+                output_msg.data.push_back(z_mvd[0]);
+                output_msg.data.push_back(z_mvd[1]);
+                output_msg.data.push_back(z_mvd[2]);
 
-            // publish
-            mPubYPixelToPcLoc.publish(output_msg);
+                std::stringstream ss;
+                ss <<"y_callback:\nmean:   " << y_mvd[0]
+                << "\nvar:   " << y_mvd[1] << "\n\n";
+                ROS_INFO("%s", ss.str().c_str());
+
+                // publish
+                mPubYPixelToPcLoc.publish(output_msg);
+            }
         //}
     }
 
