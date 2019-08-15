@@ -1607,9 +1607,9 @@ namespace zed_wrapper {
 
     void ZEDWrapperNodelet::xPixelCallback(const geometry_msgs::PoseArray::ConstPtr &message)
     {
-        //std::unique_lock<std::mutex> lock(mPcMutex, std::defer_lock);
-        //if (lock.try_lock()) 
-        //{
+        std::unique_lock<std::mutex> lock(mPcMutex, std::defer_lock);
+        if (lock.try_lock()) 
+        {
             sl::float4 point3d;
             std::vector<double> x_pts;
             std::vector<double> y_pts;
@@ -1641,15 +1641,19 @@ namespace zed_wrapper {
             output_msg.data.push_back(z_mvd[0]);
             output_msg.data.push_back(z_mvd[1]);
             output_msg.data.push_back(z_mvd[2]);
+            output_msg.data.push_back(mPointCloudTime.sec);
+            output_msg.data.push_back(mPointCloudTime.nsec);
 
+            /*
             std::stringstream ss;
             ss << "x_callback:\nmean:   " << y_mvd[0]
                << "\nvar:   " << y_mvd[1] << "\n\n";
             ROS_INFO("%s", ss.str().c_str());
+            */
 
             // publish
             mPubXPixelToPcLoc.publish(output_msg);
-        //}
+        }
     }
 
     void ZEDWrapperNodelet::publishPointCloud() {
