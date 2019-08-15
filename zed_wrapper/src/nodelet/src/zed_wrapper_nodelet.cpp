@@ -2586,7 +2586,8 @@ namespace zed_wrapper {
                     // Retrieve raw pointCloud data if latest Pointcloud is ready
                     std::unique_lock<std::mutex> lock(mPcMutex, std::defer_lock);
 
-                    if (lock.try_lock()) {
+                    if (lock.try_lock()) 
+                    {
                         mZed.retrieveMeasure(mCloud, sl::MEASURE_XYZBGRA, sl::MEM_CPU, mMatWidth, mMatHeight);
                         //mZed.retrieveMeasure(mCloud, sl::MEASURE_XYZBGRA, sl::MEM_CPU, int(mMatWidth/4), int(mMatHeight/4));
 

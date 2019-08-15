@@ -542,6 +542,8 @@ namespace zed_wrapper {
 
         // Point cloud variables
         sl::Mat mCloud;
+        std::vector<std::pair<ros::Time, sl::Mat> clouds;
+
         sensor_msgs::PointCloud2Ptr mPointcloudMsg;
 #if ((ZED_SDK_MAJOR_VERSION>2) || (ZED_SDK_MAJOR_VERSION==2 && ZED_SDK_MINOR_VERSION>=8) )
         sl::FusedPointCloud mFusedPC;
