@@ -1707,8 +1707,8 @@ namespace zed_wrapper {
         mPointcloudMsg->header.stamp = mPointCloudTime;
 
         if (mPointcloudMsg->width != mMatWidth || mPointcloudMsg->height != mMatHeight) {
-            //mPointcloudMsg->header.frame_id = mPointCloudFrameId; // Set the header values of the ROS message
-            mPointcloudMsg->header.frame_id = "fcu";
+            mPointcloudMsg->header.frame_id = mPointCloudFrameId; // Set the header values of the ROS message
+            //mPointcloudMsg->header.frame_id = "fcu";
 
             mPointcloudMsg->is_bigendian = false;
             mPointcloudMsg->is_dense = false;
