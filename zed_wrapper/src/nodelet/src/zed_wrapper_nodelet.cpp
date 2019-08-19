@@ -2627,10 +2627,10 @@ namespace zed_wrapper {
                         mPointCloudFrameId = mDepthFrameId;
                         mPointCloudTime = mFrameTimestamp;
 
-                        if (clouds.size() > 15)
+                        if (clouds.size() > 20)
                         {
-                            while (clouds.size() > 10)
-                                clouds.pop_back();
+                            while (clouds.size() > 15)
+                                clouds.pop_front();
                         }
                         clouds.push_back(std::make_pair(mFrameTimestamp, mCloud));
                         
