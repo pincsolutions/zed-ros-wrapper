@@ -2630,7 +2630,7 @@ namespace zed_wrapper {
                         if (clouds.size() > 20)
                         {
                             while (clouds.size() > 15)
-                                clouds.pop_front();
+                                clouds.erase(clouds.begin());
                         }
                         clouds.push_back(std::make_pair(mFrameTimestamp, mCloud));
                         
