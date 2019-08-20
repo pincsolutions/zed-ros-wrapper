@@ -1688,8 +1688,8 @@ namespace zed_wrapper {
             output_msg.data.push_back(mPointCloudTime.nsec);
             output_msg.data.push_back(message->front_side_active);
 
-            std::cout << "f" std::endl;
-            
+            std::cout << "f" << std::endl;
+
             // publish
             mPubXPixelToPcLoc.publish(output_msg);
         }
