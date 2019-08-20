@@ -1681,6 +1681,7 @@ namespace zed_wrapper {
                 output_msg.data.push_back(z_mvd[2]);
                 output_msg.data.push_back(mPointCloudTime.sec);
                 output_msg.data.push_back(mPointCloudTime.nsec);
+                output_msg.data.push_back(message.front_side_active);
 
                 // publish
                 mPubXPixelToPcLoc.publish(output_msg);
