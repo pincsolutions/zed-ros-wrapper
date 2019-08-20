@@ -1628,65 +1628,71 @@ namespace zed_wrapper {
     //void ZEDWrapperNodelet::xPixelCallback(const geometry_msgs::PoseArray::ConstPtr &message)
     void ZEDWrapperNodelet::xPixelCallback(const aisle_keeper::PixelQuery::ConstPtr &message) 
     {
-        //std::unique_lock<std::mutex> lock(mPcMutex, std::defer_lock);
-        //if (lock.try_lock()) 
-        //{
+        int ind = 0;
+        bool cloudFound = false;
 
-            int ind = 0;
-            bool cloudFound = false;
+        std::cout << "a" << std::endl;
 
-            for (; ind < clouds.size(); ind++)
+        for (; ind < clouds.size(); ind++)
+        {
+            if ((message->imageStamp.data.sec == clouds[ind].first.sec) && (message->imageStamp.data.nsec == clouds[ind].first.nsec))
             {
-                if ((message->imageStamp.data.sec == clouds[ind].first.sec) && (message->imageStamp.data.nsec == clouds[ind].first.nsec))
+                cloudFound = true;
+                break;
+            }
+        }
+
+        std::cout << "b" << std::endl;
+
+        if (cloudFound)
+        {
+            sl::float4 point3d;
+            std::vector<double> x_pts;
+            std::vector<double> y_pts;
+            std::vector<double> z_pts;
+
+            std::cout << "c" << std::endl;
+            
+            for (int i = 1; i < message->poses.size(); i++)
+            {
+                clouds[ind].second.getValue(size_t(int(message->poses[i].position.y)), size_t(int(message->poses[i].position.x)), &point3d);
+                
+                if (!isnan(point3d.x) && !isnan(point3d.y) && !isnan(point3d.z))
                 {
-                    cloudFound = true;
-                    break;
+                    x_pts.push_back(point3d.x);
+                    y_pts.push_back(point3d.y);
+                    z_pts.push_back(point3d.z);
                 }
             }
+            std::cout << "d" << std::endl;
 
-            if (cloudFound)
-            {
-                sl::float4 point3d;
-                std::vector<double> x_pts;
-                std::vector<double> y_pts;
-                std::vector<double> z_pts;
-                //for (auto pose : message->poses)
-                for (int i = 1; i < message->poses.size(); i++)
-                {
-                    //mCloud.getValue(size_t(int(message->poses[i].position.y)), size_t(int(message->poses[i].position.x)), &point3d);
-                    clouds[ind].second.getValue(size_t(int(message->poses[i].position.y)), size_t(int(message->poses[i].position.x)), &point3d);
-                    
-                    if (!isnan(point3d.x) && !isnan(point3d.y) && !isnan(point3d.z))
-                    {
-                        x_pts.push_back(point3d.x);
-                        y_pts.push_back(point3d.y);
-                        z_pts.push_back(point3d.z);
-                    }
-                }
-                std::vector<double> x_mvd = mean_var_dev(x_pts);
-                std::vector<double> y_mvd = mean_var_dev(y_pts);
-                std::vector<double> z_mvd = mean_var_dev(z_pts);
+            std::vector<double> x_mvd = mean_var_dev(x_pts);
+            std::vector<double> y_mvd = mean_var_dev(y_pts);
+            std::vector<double> z_mvd = mean_var_dev(z_pts);
 
-                // construct ros message
-                std_msgs::Float64MultiArray output_msg;
-                output_msg.data.push_back(message->poses[0].position.x);
-                output_msg.data.push_back(x_mvd[0]);
-                output_msg.data.push_back(x_mvd[1]);
-                output_msg.data.push_back(x_mvd[2]);
-                output_msg.data.push_back(y_mvd[0]);
-                output_msg.data.push_back(y_mvd[1]);
-                output_msg.data.push_back(y_mvd[2]);
-                output_msg.data.push_back(z_mvd[0]);
-                output_msg.data.push_back(z_mvd[1]);
-                output_msg.data.push_back(z_mvd[2]);
-                output_msg.data.push_back(mPointCloudTime.sec);
-                output_msg.data.push_back(mPointCloudTime.nsec);
-                output_msg.data.push_back(message->front_side_active);
+            std::cout << "e" << std::endl;
 
-                // publish
-                mPubXPixelToPcLoc.publish(output_msg);
-            }
-        //}
+            // construct ros message
+            std_msgs::Float64MultiArray output_msg;
+            output_msg.data.push_back(message->poses[0].position.x);
+            output_msg.data.push_back(x_mvd[0]);
+            output_msg.data.push_back(x_mvd[1]);
+            output_msg.data.push_back(x_mvd[2]);
+            output_msg.data.push_back(y_mvd[0]);
+            output_msg.data.push_back(y_mvd[1]);
+            output_msg.data.push_back(y_mvd[2]);
+            output_msg.data.push_back(z_mvd[0]);
+            output_msg.data.push_back(z_mvd[1]);
+            output_msg.data.push_back(z_mvd[2]);
+            output_msg.data.push_back(mPointCloudTime.sec);
+            output_msg.data.push_back(mPointCloudTime.nsec);
+            output_msg.data.push_back(message->front_side_active);
+
+            std::cout << "f" std::endl;
+            
+            // publish
+            mPubXPixelToPcLoc.publish(output_msg);
+        }
     }
 
     void ZEDWrapperNodelet::publishPointCloud() {
