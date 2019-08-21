@@ -421,8 +421,6 @@ namespace zed_wrapper {
         // initialize pixel to pointcloud subscriber and publisher/pixel
         mPubYPixelToPcLoc = mNhNs.advertise<std_msgs::Float64MultiArray>("y_pixel_to_pc_location", 1);
         mPubXPixelToPcLoc = mNhNs.advertise<std_msgs::Float64MultiArray>("x_pixel_to_pc_location", 1);
-        //mSubYPixelToPcInquiry = mNhNs.subscribe<geometry_msgs::PoseArray>("y_pixel_to_pc_inquiry", 1, boost::bind(&zed_wrapper::ZEDWrapperNodelet::yPixelCallback, this, _1));
-        //mSubXPixelToPcInquiry = mNhNs.subscribe<geometry_msgs::PoseArray>("x_pixel_to_pc_inquiry", 1, boost::bind(&zed_wrapper::ZEDWrapperNodelet::xPixelCallback, this, _1));
         mSubYPixelToPcInquiry = mNhNs.subscribe<aisle_keeper::PixelQuery>("y_pixel_to_pc_inquiry", 1, boost::bind(&zed_wrapper::ZEDWrapperNodelet::yPixelCallback, this, _1));
         mSubXPixelToPcInquiry = mNhNs.subscribe<aisle_keeper::PixelQuery>("x_pixel_to_pc_inquiry", 1, boost::bind(&zed_wrapper::ZEDWrapperNodelet::xPixelCallback, this, _1));
 
@@ -1562,42 +1560,40 @@ namespace zed_wrapper {
         NODELET_DEBUG("Pointcloud thread finished");
     }
  
-    //void ZEDWrapperNodelet::yPixelCallback(const geometry_msgs::PoseArray::ConstPtr &message)
     void ZEDWrapperNodelet::yPixelCallback(const aisle_keeper::PixelQuery::ConstPtr &message)
     {
-        //std::unique_lock<std::mutex> lock(mPcMutex, std::defer_lock);
-        //if (lock.try_lock()) 
-        //{
+        int ind = 0;
+        bool cloudFound = false;
 
-            int ind = 0;
-            bool cloudFound = false;
-
-            for (; ind < clouds.size(); ind++)
+        for (; ind < clouds.size(); ind++)
+        {
+            if ((message->imageStamp.data.sec == clouds[ind].first.sec) && (message->imageStamp.data.nsec == clouds[ind].first.nsec))
             {
-                if ((message->imageStamp.data.sec == clouds[ind].first.sec) && (message->imageStamp.data.nsec == clouds[ind].first.nsec))
+                cloudFound = true;
+                break;
+            }
+        }
+
+        if (cloudFound)
+        {
+            sl::float4 point3d;
+            std::vector<double> x_pts;
+            std::vector<double> y_pts;
+            std::vector<double> z_pts;
+            for (auto pose : message->poses)
+            {
+                //mCloud.getValue(size_t(int(pose.position.y)), size_t(int(pose.position.x)), &point3d);
+                clouds[ind].second.getValue(size_t(int(pose.position.y)), size_t(int(pose.position.x)), &point3d);
+                if (!isnan(point3d.x) && !isnan(point3d.y) && !isnan(point3d.z))
                 {
-                    cloudFound = true;
-                    break;
+                    x_pts.push_back(point3d.x);
+                    y_pts.push_back(point3d.y);
+                    z_pts.push_back(point3d.z);
                 }
             }
 
-            if (cloudFound)
+            if ((x_pts.size() > 0) && (y_pts.size() > 0) && (z_pts.size() > 0))
             {
-                sl::float4 point3d;
-                std::vector<double> x_pts;
-                std::vector<double> y_pts;
-                std::vector<double> z_pts;
-                for (auto pose : message->poses)
-                {
-                    //mCloud.getValue(size_t(int(pose.position.y)), size_t(int(pose.position.x)), &point3d);
-                    clouds[ind].second.getValue(size_t(int(pose.position.y)), size_t(int(pose.position.x)), &point3d);
-                    if (!isnan(point3d.x) && !isnan(point3d.y) && !isnan(point3d.z))
-                    {
-                        x_pts.push_back(point3d.x);
-                        y_pts.push_back(point3d.y);
-                        z_pts.push_back(point3d.z);
-                    }
-                }
                 std::vector<double> x_mvd = mean_var_dev(x_pts);
                 std::vector<double> y_mvd = mean_var_dev(y_pts);
                 std::vector<double> z_mvd = mean_var_dev(z_pts);
@@ -1614,18 +1610,14 @@ namespace zed_wrapper {
                 output_msg.data.push_back(z_mvd[1]);
                 output_msg.data.push_back(z_mvd[2]);
 
-                std::stringstream ss;
-                ss <<"y_callback:\nmean:   " << y_mvd[0]
-                << "\nvar:   " << y_mvd[1] << "\n\n";
-                ROS_INFO("%s", ss.str().c_str());
-
                 // publish
                 mPubYPixelToPcLoc.publish(output_msg);
             }
-        //}
+        }
+        else
+            ROS_INFO("yPixelCb: cloud missed");
     }
 
-    //void ZEDWrapperNodelet::xPixelCallback(const geometry_msgs::PoseArray::ConstPtr &message)
     void ZEDWrapperNodelet::xPixelCallback(const aisle_keeper::PixelQuery::ConstPtr &message) 
     {
         int ind = 0;
@@ -1685,6 +1677,8 @@ namespace zed_wrapper {
                 mPubXPixelToPcLoc.publish(output_msg);
             }
         }
+        else
+            ROS_INFO("xPixelCb: cloud missed");
     }
 
     void ZEDWrapperNodelet::publishPointCloud() {

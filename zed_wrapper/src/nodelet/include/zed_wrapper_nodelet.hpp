@@ -160,14 +160,12 @@ namespace zed_wrapper {
         /* \brief Takes in a pixel location and finds corresponding location point cloud.
                   Used in correcting y drift externally.
          */
-        //void yPixelCallback(const geometry_msgs::PoseArray::ConstPtr& message);
         void yPixelCallback(const aisle_keeper::PixelQuery::ConstPtr &message);
         
 
          /* \brief Takes in a pixel location and finds corresponding location point cloud.
                     Used in corrected x drift, externally.
          */
-        //void xPixelCallback(const geometry_msgs::PoseArray::ConstPtr& message);
         void xPixelCallback(const aisle_keeper::PixelQuery::ConstPtr &message);
 
 
