@@ -2609,7 +2609,7 @@ namespace zed_wrapper {
                     if (lockCloudsCache.try_lock())
                     {
                         mZed.retrieveMeasure(mCloud, sl::MEASURE_XYZBGRA, sl::MEM_CPU, mMatWidth, mMatHeight);
-                        ROS_INFO("cloudLoop: acquired vector lock");
+                        ROS_INFO_THROTTLE(1, "cloudLoop: acquired vector lock");
                         // maintain queue size
                         while(clouds.size() > 500)
                             clouds.erase(clouds.begin());
@@ -2620,7 +2620,7 @@ namespace zed_wrapper {
                     }
                     else
                     {
-                        ROS_INFO("cloudLoop: could not acquire vector lock");
+                        ROS_INFO_THROTTLE(1, "cloudLoop: could not acquire vector lock");
                         mPcAvailable = false;
                     }
 
@@ -2640,7 +2640,7 @@ namespace zed_wrapper {
                             pcPublishStamp = current_time;
                         }
                         else
-                            ROS_INFO("cloudLoop: could not acquire retrieveMeasure lock");
+                            ROS_INFO_THROTTLE(1, "cloudLoop: could not acquire retrieveMeasure lock");
                     }
                 } 
                 else 
