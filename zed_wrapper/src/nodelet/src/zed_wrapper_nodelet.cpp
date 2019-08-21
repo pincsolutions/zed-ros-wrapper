@@ -1683,6 +1683,8 @@ namespace zed_wrapper {
             else
                 ROS_INFO("xPixelCb: cloud missed");
         }
+        else
+            ROS_INFO("xPixelCb: could not secure lock");
     }
 
     void ZEDWrapperNodelet::publishPointCloud() {
@@ -2617,7 +2619,7 @@ namespace zed_wrapper {
                         mPointCloudTime = mFrameTimestamp;
 
                         // maintain queue size
-                        while(clouds.size() > 700)
+                        while(clouds.size() > 800)
                             clouds.erase(clouds.begin());
                         
                         // append new cloud data
