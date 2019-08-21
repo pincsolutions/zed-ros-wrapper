@@ -2618,12 +2618,7 @@ namespace zed_wrapper {
                 }
 
                 // Publish the point cloud if someone has subscribed to
-                //if (cloudSubnumber > 0) {
-                if (true) 
-                {
-                    // need the zed to continually retrieve pointcloud data, even though sub number is 0. 
-                    // external nodes depend on quirying the data. cannot be static.
-
+                if (cloudSubnumber > 0) {
                     // Run the point cloud conversion asynchronously to avoid slowing down
                     // all the program
                     // Retrieve raw pointCloud data if latest Pointcloud is ready
@@ -2636,20 +2631,18 @@ namespace zed_wrapper {
                         mPointCloudFrameId = mDepthFrameId;
                         mPointCloudTime = mFrameTimestamp;
 
+                        /*
                         if (clouds.size() > 20)
                         {
                             while (clouds.size() > 15)
                                 clouds.erase(clouds.begin());
                         }
                         clouds.push_back(std::make_pair(mFrameTimestamp, mCloud));
-                        
-                        if (cloudSubnumber > 0)
-                        {
-                            // Signal Pointcloud thread that a new pointcloud is ready
-                            mPcDataReadyCondVar.notify_one();
-                            mPcDataReady = true;
-                            mPcPublishing = true;
-                        }
+                        */
+                        // Signal Pointcloud thread that a new pointcloud is ready
+                        mPcDataReadyCondVar.notify_one();
+                        mPcDataReady = true;
+                        mPcPublishing = true;
                     }
                 } else {
                     mPcPublishing = false;
