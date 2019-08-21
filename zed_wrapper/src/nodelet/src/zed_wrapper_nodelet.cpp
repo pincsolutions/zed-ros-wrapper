@@ -2624,7 +2624,7 @@ namespace zed_wrapper {
                         mPcAvailable = false;
                     }
 
-                    if ((current_time - publishStamp) > pcPublishInterval)
+                    if ((current_time - pcPublishStamp) > pcPublishInterval)
                     {
                         std::unique_lock<std::mutex> lock(mPcMutex, std::defer_lock);
                         if (lock.try_lock()) 
@@ -2637,7 +2637,7 @@ namespace zed_wrapper {
                             mPcDataReadyCondVar.notify_one();
                             mPcDataReady = true;
                             mPcPublishing = true;
-                            publishStamp = current_time;
+                            pcPublishStamp = current_time;
                         }
                         else
                             ROS_INFO("cloudLoop: could not acquire retrieveMeasure lock");
