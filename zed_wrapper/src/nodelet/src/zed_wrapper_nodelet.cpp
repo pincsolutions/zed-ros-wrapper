@@ -1625,77 +1625,71 @@ namespace zed_wrapper {
     {
         ROS_INFO("xPixelCallback: attempting to secure lock");
         std::lock_guard<std::mutex> guard(mCloudsCacheMutex);
-        //std::unique_lock<std::mutex> lock(mCloudsCacheMutex, std::defer_lock);
-        //if (lock.try_lock()) 
-        //{
-            ROS_INFO("xPixelCallback: secured lock");
-            int ind = 0;
-            bool cloudFound = false;
+        ROS_INFO("xPixelCallback: secured lock");
+        int ind = 0;
+        bool cloudFound = false;
 
-            std::stringstream cloudSize;
-            cloudSize << "cloud size: " << clouds.size() << "\n";
-            ROS_INFO("%s", cloudSize.str().c_str());
+        std::stringstream cloudSize;
+        cloudSize << "cloud size: " << clouds.size() << "\n";
+        ROS_INFO("%s", cloudSize.str().c_str());
 
-            for (; ind < clouds.size(); ind++)
+        for (; ind < clouds.size(); ind++)
+        {
+            if ((message->imageStamp.data.sec == clouds[ind].first.sec) && (message->imageStamp.data.nsec == clouds[ind].first.nsec))
             {
-                if ((message->imageStamp.data.sec == clouds[ind].first.sec) && (message->imageStamp.data.nsec == clouds[ind].first.nsec))
+                cloudFound = true;
+                break;
+            }
+        }
+
+        if (cloudFound)
+        {
+            sl::float4 point3d;
+            std::vector<double> x_pts;
+            std::vector<double> y_pts;
+            std::vector<double> z_pts;
+
+            for (int i = 1; i < message->poses.size(); i++)
+            {
+                clouds[ind].second.getValue(size_t(int(message->poses[i].position.y)), size_t(int(message->poses[i].position.x)), &point3d);
+                
+                if (!isnan(point3d.x) && !isnan(point3d.y) && !isnan(point3d.z))
                 {
-                    cloudFound = true;
-                    break;
+                    x_pts.push_back(point3d.x);
+                    y_pts.push_back(point3d.y);
+                    z_pts.push_back(point3d.z);
                 }
             }
 
-            if (cloudFound)
+            if ((x_pts.size() > 0) && (y_pts.size() > 0) && (z_pts.size() > 0))
             {
-                sl::float4 point3d;
-                std::vector<double> x_pts;
-                std::vector<double> y_pts;
-                std::vector<double> z_pts;
+                std::vector<double> x_mvd = mean_var_dev(x_pts);
+                std::vector<double> y_mvd = mean_var_dev(y_pts);
+                std::vector<double> z_mvd = mean_var_dev(z_pts);
 
-                for (int i = 1; i < message->poses.size(); i++)
-                {
-                    clouds[ind].second.getValue(size_t(int(message->poses[i].position.y)), size_t(int(message->poses[i].position.x)), &point3d);
-                    
-                    if (!isnan(point3d.x) && !isnan(point3d.y) && !isnan(point3d.z))
-                    {
-                        x_pts.push_back(point3d.x);
-                        y_pts.push_back(point3d.y);
-                        z_pts.push_back(point3d.z);
-                    }
-                }
-
-                if ((x_pts.size() > 0) && (y_pts.size() > 0) && (z_pts.size() > 0))
-                {
-                    std::vector<double> x_mvd = mean_var_dev(x_pts);
-                    std::vector<double> y_mvd = mean_var_dev(y_pts);
-                    std::vector<double> z_mvd = mean_var_dev(z_pts);
-
-                    // construct ros message
-                    std_msgs::Float64MultiArray output_msg;
-                    output_msg.data.push_back(message->poses[0].position.x);
-                    output_msg.data.push_back(x_mvd[0]);
-                    output_msg.data.push_back(x_mvd[1]);
-                    output_msg.data.push_back(x_mvd[2]);
-                    output_msg.data.push_back(y_mvd[0]);
-                    output_msg.data.push_back(y_mvd[1]);
-                    output_msg.data.push_back(y_mvd[2]);
-                    output_msg.data.push_back(z_mvd[0]);
-                    output_msg.data.push_back(z_mvd[1]);
-                    output_msg.data.push_back(z_mvd[2]);
-                    output_msg.data.push_back(mPointCloudTime.sec);
-                    output_msg.data.push_back(mPointCloudTime.nsec);
-                    output_msg.data.push_back(message->front_side_active);
-                    
-                    // publish
-                    mPubXPixelToPcLoc.publish(output_msg);
-                }
+                // construct ros message
+                std_msgs::Float64MultiArray output_msg;
+                output_msg.data.push_back(message->poses[0].position.x);
+                output_msg.data.push_back(x_mvd[0]);
+                output_msg.data.push_back(x_mvd[1]);
+                output_msg.data.push_back(x_mvd[2]);
+                output_msg.data.push_back(y_mvd[0]);
+                output_msg.data.push_back(y_mvd[1]);
+                output_msg.data.push_back(y_mvd[2]);
+                output_msg.data.push_back(z_mvd[0]);
+                output_msg.data.push_back(z_mvd[1]);
+                output_msg.data.push_back(z_mvd[2]);
+                output_msg.data.push_back(mPointCloudTime.sec);
+                output_msg.data.push_back(mPointCloudTime.nsec);
+                output_msg.data.push_back(message->front_side_active);
+                
+                // publish
+                mPubXPixelToPcLoc.publish(output_msg);
             }
-            else
-                ROS_INFO("xPixelCb: cloud missed");
-            ROS_INFO("xPixelCallback: releasing lock");
-        //}
-        //else
-            //ROS_INFO("xPixelCallback: missed lock");
+        }
+        else
+            ROS_INFO("xPixelCb: cloud missed");
+        ROS_INFO("xPixelCallback: releasing lock");
     }
 
     void ZEDWrapperNodelet::publishPointCloud() {
@@ -2609,7 +2603,7 @@ namespace zed_wrapper {
                     if (lockCloudsCache.try_lock())
                     {
                         mZed.retrieveMeasure(mCloud, sl::MEASURE_XYZBGRA, sl::MEM_CPU, mMatWidth, mMatHeight);
-                        ROS_INFO_THROTTLE(1, "cloudLoop: acquired vector lock");
+                        //ROS_INFO_THROTTLE(1, "cloudLoop: acquired vector lock");
                         // maintain queue size
                         while(clouds.size() > 500)
                             clouds.erase(clouds.begin());
@@ -2620,7 +2614,7 @@ namespace zed_wrapper {
                     }
                     else
                     {
-                        ROS_INFO_THROTTLE(1, "cloudLoop: could not acquire vector lock");
+                        ROS_INFO("cloudLoop: could not acquire vector lock");
                         mPcAvailable = false;
                     }
 
@@ -2640,7 +2634,7 @@ namespace zed_wrapper {
                             pcPublishStamp = current_time;
                         }
                         else
-                            ROS_INFO_THROTTLE(1, "cloudLoop: could not acquire retrieveMeasure lock");
+                            ROS_INFO("cloudLoop: could not acquire retrieveMeasure lock");
                     }
                 } 
                 else 
