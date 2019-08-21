@@ -2623,8 +2623,8 @@ namespace zed_wrapper {
                     std::unique_lock<std::mutex> lock(mPcMutex, std::defer_lock);
                     if (lock.try_lock()) 
                     {
-                        mZed.retrieveMeasure(mCloud, sl::MEASURE_XYZBGRA, sl::MEM_GPU, mMatWidth, mMatHeight);
-                        mZed.retrieveMeasure(mCloudReduced, sl::MEASURE_XYZBGRA, sl::MEM_GPU, int(mMatWidth/4), int(mMatHeight/4));
+                        mZed.retrieveMeasure(mCloud, sl::MEASURE_XYZBGRA, sl::MEM_CPU, mMatWidth, mMatHeight);
+                        mZed.retrieveMeasure(mCloudReduced, sl::MEASURE_XYZBGRA, sl::MEM_CPU, int(mMatWidth/4), int(mMatHeight/4));
 
                         mPointCloudFrameId = mDepthFrameId;
                         mPointCloudTime = mFrameTimestamp;
