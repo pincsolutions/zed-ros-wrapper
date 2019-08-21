@@ -519,6 +519,7 @@ namespace zed_wrapper {
         bool mInitOdomWithPose;
         bool mResetOdom = false;
         bool mPublishPoseCovariance = true;
+        bool mPcAvailable = false;
 
         // SVO recording
         bool mRecording = false;
@@ -533,6 +534,10 @@ namespace zed_wrapper {
         int mCamHeight;
         int mMatWidth;
         int mMatHeight;
+
+        // Pointcloud publish interval
+        double pcPublishInterval = 0.1;
+        double pcPublishStamp = 0.0;
 
         // Thread Sync
         std::mutex mCloseZedMutex;

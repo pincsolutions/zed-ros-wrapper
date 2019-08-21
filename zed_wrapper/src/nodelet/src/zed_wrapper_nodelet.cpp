@@ -1524,9 +1524,12 @@ namespace zed_wrapper {
     void ZEDWrapperNodelet::pointcloud_thread_func() {
         std::unique_lock<std::mutex> lock(mPcMutex);
 
-        while (!mStopNode) {
-            while (!mPcDataReady) {  // loop to avoid spurious wakeups
-                if (mPcDataReadyCondVar.wait_for(lock, std::chrono::milliseconds(500)) == std::cv_status::timeout) {
+        while (!mStopNode) 
+        {
+            while (!mPcDataReady) 
+            {  // loop to avoid spurious wakeups
+                if (mPcDataReadyCondVar.wait_for(lock, std::chrono::milliseconds(500)) == std::cv_status::timeout) 
+                {
                     // Check thread stopping
                     if (mStopNode) {
                         return;
@@ -2514,22 +2517,6 @@ namespace zed_wrapper {
                 mCamDataMutex.lock();
 
 
-
-                // Publish the left == rgb image if someone has subscribed to
-                if (leftSubnumber > 0 || rgbSubnumber > 0) {
-
-                    // Retrieve RGBA Left image
-                    mZed.retrieveImage(leftZEDMat, sl::VIEW_LEFT, sl::MEM_CPU, mMatWidth, mMatHeight);
-
-                    if (leftSubnumber > 0) {
-                        publishImage(leftZEDMat, mPubLeft, mLeftCamInfoMsg, mLeftCamOptFrameId, mFrameTimestamp);
-                    }
-
-                    if (rgbSubnumber > 0) {
-                        publishImage(leftZEDMat, mPubRgb, mRgbCamInfoMsg, mDepthOptFrameId, mFrameTimestamp); // rgb is the left image
-                    }
-                }
-
                 // Publish the left_raw == rgb_raw image if someone has subscribed to
                 if (leftRawSubnumber > 0 || rgbRawSubnumber > 0) {
 
@@ -2613,44 +2600,67 @@ namespace zed_wrapper {
                 }
 
                 // Publish the point cloud if someone has subscribed to
-                if (cloudSubnumber > 0) {
-                    // Run the point cloud conversion asynchronously to avoid slowing down
-                    // all the program
-                    // Retrieve raw pointCloud data if latest Pointcloud is ready
-                    std::unique_lock<std::mutex> lock(mPcMutex, std::defer_lock);
+                if (cloudSubnumber > 0) 
+                {
+                    double current_time = ros::Time::now().toSec();
+
+                    // update point cloud queue
                     std::unique_lock<std::mutex> lockCloudsCache(mCloudsCacheMutex, std::defer_lock);
-                    
-                    if (lock.try_lock()) 
+                    if (lockCloudsCache.try_lock())
                     {
                         mZed.retrieveMeasure(mCloud, sl::MEASURE_XYZBGRA, sl::MEM_CPU, mMatWidth, mMatHeight);
-                        mZed.retrieveMeasure(mCloudReduced, sl::MEASURE_XYZBGRA, sl::MEM_CPU, int(mMatWidth/4), int(mMatHeight/4));
-
-                        mPointCloudFrameId = mDepthFrameId;
-                        mPointCloudTime = mFrameTimestamp;
-
-                        if (lockCloudsCache.try_lock())
-                        {
-                            ROS_INFO("cloudLoop: secured lock");
-                            // maintain queue size
-                            while(clouds.size() > 1500)
-                                clouds.erase(clouds.begin());
-                        
-                            // append new cloud data
-                            clouds.push_back(std::make_pair(mFrameTimestamp, mCloud));
-                        }
-                        else
-                            ROS_INFO("cloudLoop: missed lock");
-                        
-                        // Signal Pointcloud thread that a new pointcloud is ready
-                        mPcDataReadyCondVar.notify_one();
-                        mPcDataReady = true;
-                        mPcPublishing = true;
+                        ROS_INFO("cloudLoop: acquired vector lock");
+                        // maintain queue size
+                        while(clouds.size() > 500)
+                            clouds.erase(clouds.begin());
+                    
+                        // append new cloud data
+                        clouds.push_back(std::make_pair(mFrameTimestamp, mCloud));
+                        mPcAvailable = true;
                     }
                     else
-                        ROS_INFO("cloudLoop: missed retrieve cloud measure");
+                    {
+                        ROS_INFO("cloudLoop: could not acquire vector lock");
+                        mPcAvailable = false;
+                    }
+
+                    if ((current_time - publishStamp) > pcPublishInterval)
+                    {
+                        std::unique_lock<std::mutex> lock(mPcMutex, std::defer_lock);
+                        if (lock.try_lock()) 
+                        {
+                            mZed.retrieveMeasure(mCloudReduced, sl::MEASURE_XYZBGRA, sl::MEM_CPU, int(mMatWidth/4), int(mMatHeight/4));
+                            mPointCloudFrameId = mDepthFrameId;
+                            mPointCloudTime = mFrameTimestamp;
+
+                            // Signal Pointcloud thread that a new pointcloud is ready
+                            mPcDataReadyCondVar.notify_one();
+                            mPcDataReady = true;
+                            mPcPublishing = true;
+                            publishStamp = current_time;
+                        }
+                        else
+                            ROS_INFO("cloudLoop: could not acquire retrieveMeasure lock");
+                    }
                 } 
                 else 
                     mPcPublishing = false;
+
+
+                // Publish the left == rgb image if someone has subscribed to
+                if (leftSubnumber > 0 || rgbSubnumber > 0) {
+
+                    // Retrieve RGBA Left image
+                    mZed.retrieveImage(leftZEDMat, sl::VIEW_LEFT, sl::MEM_CPU, mMatWidth, mMatHeight);
+
+                    if (leftSubnumber > 0 && mPcAvailable) {
+                        publishImage(leftZEDMat, mPubLeft, mLeftCamInfoMsg, mLeftCamOptFrameId, mFrameTimestamp);
+                    }
+
+                    if (rgbSubnumber > 0) {
+                        publishImage(leftZEDMat, mPubRgb, mRgbCamInfoMsg, mDepthOptFrameId, mFrameTimestamp); // rgb is the left image
+                    }
+                }
 
                 mCamDataMutex.unlock();
 
