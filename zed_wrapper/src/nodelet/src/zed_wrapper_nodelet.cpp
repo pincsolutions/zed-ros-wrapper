@@ -2613,7 +2613,7 @@ namespace zed_wrapper {
                         mPointCloudTime = mFrameTimestamp;
 
                         // maintain queue size
-                        while(clouds.size() > 250)
+                        while(clouds.size() > 500)
                             clouds.erase(clouds.begin());
                         
                         // append new cloud data
