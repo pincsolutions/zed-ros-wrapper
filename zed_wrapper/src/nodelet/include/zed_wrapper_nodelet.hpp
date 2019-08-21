@@ -538,6 +538,7 @@ namespace zed_wrapper {
         std::mutex mCloseZedMutex;
         std::mutex mCamDataMutex;
         std::mutex mPcMutex;
+        std::mutex mCloudsCacheMutex;
         std::mutex mRecMutex;
         std::mutex mPosTrkMutex;
         std::condition_variable mPcDataReadyCondVar;

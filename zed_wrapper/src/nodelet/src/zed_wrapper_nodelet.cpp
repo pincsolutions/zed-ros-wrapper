@@ -1620,9 +1620,12 @@ namespace zed_wrapper {
 
     void ZEDWrapperNodelet::xPixelCallback(const aisle_keeper::PixelQuery::ConstPtr &message) 
     {
-        //std::unique_lock<std::mutex> lock(mPcMutex, std::defer_lock);
+        ROS_INFO("xPixelCallback: attempting to secure lock");
+        std::lock_guard<std::mutex> guard(mCloudsCacheMutex);
+        //std::unique_lock<std::mutex> lock(mCloudsCacheMutex, std::defer_lock);
         //if (lock.try_lock()) 
         //{
+            ROS_INFO("xPixelCallback: secured lock");
             int ind = 0;
             bool cloudFound = false;
 
@@ -1682,9 +1685,10 @@ namespace zed_wrapper {
             }
             else
                 ROS_INFO("xPixelCb: cloud missed");
+            ROS_INFO("xPixelCallback: releasing lock");
         //}
         //else
-            //ROS_INFO("xPixelCb: could not secure lock");
+            //ROS_INFO("xPixelCallback: missed lock");
     }
 
     void ZEDWrapperNodelet::publishPointCloud() {
@@ -2610,6 +2614,8 @@ namespace zed_wrapper {
                     // all the program
                     // Retrieve raw pointCloud data if latest Pointcloud is ready
                     std::unique_lock<std::mutex> lock(mPcMutex, std::defer_lock);
+                    std::unique_lock<std::mutex> lockCloudsCache(mCloudsCacheMutex, std::defer_lock);
+                    
                     if (lock.try_lock()) 
                     {
                         mZed.retrieveMeasure(mCloud, sl::MEASURE_XYZBGRA, sl::MEM_CPU, mMatWidth, mMatHeight);
@@ -2618,12 +2624,15 @@ namespace zed_wrapper {
                         mPointCloudFrameId = mDepthFrameId;
                         mPointCloudTime = mFrameTimestamp;
 
-                        // maintain queue size
-                        while(clouds.size() > 1500)
-                            clouds.erase(clouds.begin());
+                        if (lockCloudsCache.try_lock())
+                        {
+                            // maintain queue size
+                            while(clouds.size() > 1500)
+                                clouds.erase(clouds.begin());
                         
-                        // append new cloud data
-                        clouds.push_back(std::make_pair(mFrameTimestamp, mCloud));
+                            // append new cloud data
+                            clouds.push_back(std::make_pair(mFrameTimestamp, mCloud));
+                        }
                         
                         // Signal Pointcloud thread that a new pointcloud is ready
                         mPcDataReadyCondVar.notify_one();
@@ -2632,9 +2641,7 @@ namespace zed_wrapper {
                     }
                 } 
                 else 
-                {
                     mPcPublishing = false;
-                }
 
                 mCamDataMutex.unlock();
 
