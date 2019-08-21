@@ -547,6 +547,7 @@ namespace zed_wrapper {
 
         // Point cloud variables
         sl::Mat mCloud;
+        sl::Mat mCloudReduced;
         std::vector<std::pair<ros::Time, sl::Mat>> clouds;
         aisle_keeper::PixelQuery pQ;
 

@@ -1711,10 +1711,7 @@ namespace zed_wrapper {
         // Initialize Point Cloud message
         // https://github.com/ros/common_msgs/blob/jade-devel/sensor_msgs/include/sensor_msgs/point_cloud2_iterator.h
 
-        //int ptsCount = int(mMatWidth/4) * int(mMatHeight/4);
-        //int ptsCount = mMatWidth * mMatHeight;
-        int ptsCount = int(mCloud.getWidth()) * int(mCloud.getHeight());
-
+        int ptsCount = int(mCloudReduced.getWidth()) * int(mCloudReduced.getHeight());
         mPointcloudMsg->header.stamp = mPointCloudTime;
 
         if (mPointcloudMsg->width != mMatWidth || mPointcloudMsg->height != mMatHeight) {
@@ -1723,10 +1720,8 @@ namespace zed_wrapper {
             mPointcloudMsg->is_bigendian = false;
             mPointcloudMsg->is_dense = false;
 
-            //mPointcloudMsg->width = int(mMatWidth/4);
-            //mPointcloudMsg->height = int(mMatHeight/4);
-            mPointcloudMsg->width = mCloud.getWidth();
-            mPointcloudMsg->height = mCloud.getHeight();
+            mPointcloudMsg->width = mCloudReduced.getWidth();
+            mPointcloudMsg->height = mCloudReduced.getHeight();
 
             sensor_msgs::PointCloud2Modifier modifier(*mPointcloudMsg);
             modifier.setPointCloud2Fields(4,
@@ -1737,7 +1732,7 @@ namespace zed_wrapper {
         }
 
         // Data copy
-        sl::Vector4<float>* cpu_cloud = mCloud.getPtr<sl::float4>();
+        sl::Vector4<float>* cpu_cloud = mCloudReduced.getPtr<sl::float4>();
         float* ptCloudPtr = (float*)(&mPointcloudMsg->data[0]);
 
 #if ((ZED_SDK_MAJOR_VERSION>2) || (ZED_SDK_MAJOR_VERSION==2 && ZED_SDK_MINOR_VERSION>=5) )
@@ -2628,20 +2623,20 @@ namespace zed_wrapper {
                     std::unique_lock<std::mutex> lock(mPcMutex, std::defer_lock);
                     if (lock.try_lock()) 
                     {
-                        //mZed.retrieveMeasure(mCloud, sl::MEASURE_XYZBGRA, sl::MEM_CPU, mMatWidth, mMatHeight);
-                        mZed.retrieveMeasure(mCloud, sl::MEASURE_XYZBGRA, sl::MEM_CPU, int(mMatWidth/4), int(mMatHeight/4));
+                        mZed.retrieveMeasure(mCloud, sl::MEASURE_XYZBGRA, sl::MEM_CPU, mMatWidth, mMatHeight);
+                        mZed.retrieveMeasure(mCloudReduced, sl::MEASURE_XYZBGRA, sl::MEM_CPU, int(mMatWidth/4), int(mMatHeight/4));
 
                         mPointCloudFrameId = mDepthFrameId;
                         mPointCloudTime = mFrameTimestamp;
 
-                        /*
+                        
                         if (clouds.size() > 20)
                         {
                             while (clouds.size() > 15)
                                 clouds.erase(clouds.begin());
                         }
                         clouds.push_back(std::make_pair(mFrameTimestamp, mCloud));
-                        */
+                        
                         // Signal Pointcloud thread that a new pointcloud is ready
                         mPcDataReadyCondVar.notify_one();
                         mPcDataReady = true;
