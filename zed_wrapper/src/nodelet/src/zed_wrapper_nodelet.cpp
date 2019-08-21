@@ -2612,12 +2612,11 @@ namespace zed_wrapper {
                         mPointCloudFrameId = mDepthFrameId;
                         mPointCloudTime = mFrameTimestamp;
 
+                        // maintain queue size
+                        while(clouds.size() > 50)
+                            clouds.erase(clouds.begin());
                         
-                        if (clouds.size() > 20)
-                        {
-                            while (clouds.size() > 15)
-                                clouds.erase(clouds.begin());
-                        }
+                        // append new cloud data
                         clouds.push_back(std::make_pair(mFrameTimestamp, mCloud));
                         
                         // Signal Pointcloud thread that a new pointcloud is ready
