@@ -1620,9 +1620,9 @@ namespace zed_wrapper {
 
     void ZEDWrapperNodelet::xPixelCallback(const aisle_keeper::PixelQuery::ConstPtr &message) 
     {
-        std::unique_lock<std::mutex> lock(mPcMutex, std::defer_lock);
-        if (lock.try_lock()) 
-        {
+        //std::unique_lock<std::mutex> lock(mPcMutex, std::defer_lock);
+        //if (lock.try_lock()) 
+        //{
             int ind = 0;
             bool cloudFound = false;
 
@@ -1682,9 +1682,9 @@ namespace zed_wrapper {
             }
             else
                 ROS_INFO("xPixelCb: cloud missed");
-        }
-        else
-            ROS_INFO("xPixelCb: could not secure lock");
+        //}
+        //else
+            //ROS_INFO("xPixelCb: could not secure lock");
     }
 
     void ZEDWrapperNodelet::publishPointCloud() {
