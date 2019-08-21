@@ -1629,6 +1629,10 @@ namespace zed_wrapper {
             int ind = 0;
             bool cloudFound = false;
 
+            std::stringstream cloudSize;
+            cloudSize << "cloud size: " << clouds.size() << "\n";
+            ROS_INFO("%s", cloudSize.str().c_str());
+
             for (; ind < clouds.size(); ind++)
             {
                 if ((message->imageStamp.data.sec == clouds[ind].first.sec) && (message->imageStamp.data.nsec == clouds[ind].first.nsec))
@@ -2626,6 +2630,7 @@ namespace zed_wrapper {
 
                         if (lockCloudsCache.try_lock())
                         {
+                            ROS_INFO("cloudLoop: secured lock");
                             // maintain queue size
                             while(clouds.size() > 1500)
                                 clouds.erase(clouds.begin());
@@ -2633,12 +2638,16 @@ namespace zed_wrapper {
                             // append new cloud data
                             clouds.push_back(std::make_pair(mFrameTimestamp, mCloud));
                         }
+                        else
+                            ROS_INFO("cloudLoop: missed lock");
                         
                         // Signal Pointcloud thread that a new pointcloud is ready
                         mPcDataReadyCondVar.notify_one();
                         mPcDataReady = true;
                         mPcPublishing = true;
                     }
+                    else
+                        ROS_INFO("cloudLoop: missed retrieve cloud measure");
                 } 
                 else 
                     mPcPublishing = false;
