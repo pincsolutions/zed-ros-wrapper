@@ -1623,8 +1623,10 @@ namespace zed_wrapper {
 
                 // publish
                 mPubYPixelToPcLoc.publish(output_msg);
+                ROS_INFO("yPixelCb: publishing points");
             }
-            ROS_INFO("yPixelCb: no points to publish");
+            else
+                ROS_INFO("yPixelCb: NO    points to publish");
         }
         else
             ROS_INFO("yPixelCb: cloud missed");
@@ -1692,12 +1694,14 @@ namespace zed_wrapper {
                 output_msg.data.push_back(mPointCloudTime.sec);
                 output_msg.data.push_back(mPointCloudTime.nsec);
                 output_msg.data.push_back(message->front_side_active);
+
+                ROS_INFO("xPixelCb: publishing points");
                 
                 // publish
                 mPubXPixelToPcLoc.publish(output_msg);
             }
             else
-                ROS_INFO("xPixelCb: no points to publish");
+                ROS_INFO("xPixelCb: NO        points to publish");
         }
         else
             ROS_INFO("xPixelCb: cloud missed");
