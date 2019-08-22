@@ -1569,10 +1569,6 @@ namespace zed_wrapper {
         std::lock_guard<std::mutex> guard(mCloudsCacheMutex);
         ROS_INFO("yPixelCb: secured lock");
         
-        std::stringstream cloudSize;
-        cloudSize << "yPixelCb: cloud size - " << clouds.size();
-        ROS_INFO("%s", cloudSize.str().c_str());
-        
         int ind = 0;
         bool cloudFound = false;
 
@@ -1620,6 +1616,9 @@ namespace zed_wrapper {
                 output_msg.data.push_back(z_mvd[0]);
                 output_msg.data.push_back(z_mvd[1]);
                 output_msg.data.push_back(z_mvd[2]);
+                output_msg.data.push_back(clouds[ind].first.sec);
+                output_msg.data.push_back(clouds[ind].first.nsec);
+                output_msg.data.push_back(message->front_side_active);
 
                 // publish
                 mPubYPixelToPcLoc.publish(output_msg);
@@ -1640,10 +1639,6 @@ namespace zed_wrapper {
         ROS_INFO("xPixelCb: secured lock");
         int ind = 0;
         bool cloudFound = false;
-
-        std::stringstream cloudSize;
-        cloudSize << "xPixelCb: cloud size - " << clouds.size();
-        ROS_INFO("%s", cloudSize.str().c_str());
 
         for (; ind < clouds.size(); ind++)
         {
@@ -1691,8 +1686,8 @@ namespace zed_wrapper {
                 output_msg.data.push_back(z_mvd[0]);
                 output_msg.data.push_back(z_mvd[1]);
                 output_msg.data.push_back(z_mvd[2]);
-                output_msg.data.push_back(mPointCloudTime.sec);
-                output_msg.data.push_back(mPointCloudTime.nsec);
+                output_msg.data.push_back(clouds[ind].first.sec);
+                output_msg.data.push_back(clouds[ind].first.nsec);
                 output_msg.data.push_back(message->front_side_active);
 
                 ROS_INFO("xPixelCb: publishing points");
