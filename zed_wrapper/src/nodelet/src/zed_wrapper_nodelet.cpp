@@ -1565,12 +1565,12 @@ namespace zed_wrapper {
  
     void ZEDWrapperNodelet::yPixelCallback(const aisle_keeper::PixelQuery::ConstPtr &message)
     {
-        ROS_INFO("yPixelCallback: attempting to secure lock");
+        ROS_INFO("yPixelCb: attempting to secure lock");
         std::lock_guard<std::mutex> guard(mCloudsCacheMutex);
-        ROS_INFO("yPixelCallback: secured lock");
+        ROS_INFO("yPixelCb: secured lock");
         
         std::stringstream cloudSize;
-        cloudSize << "yPixelCallback: cloud size - " << clouds.size();
+        cloudSize << "yPixelCb: cloud size - " << clouds.size();
         ROS_INFO("%s", cloudSize.str().c_str());
         
         int ind = 0;
@@ -1624,22 +1624,23 @@ namespace zed_wrapper {
                 // publish
                 mPubYPixelToPcLoc.publish(output_msg);
             }
+            ROS_INFO("yPixelCb: no points to publish");
         }
         else
             ROS_INFO("yPixelCb: cloud missed");
-        ROS_INFO("yPixelCallback: releasing lock");
+        ROS_INFO("yPixelCb: releasing lock");
     }
 
     void ZEDWrapperNodelet::xPixelCallback(const aisle_keeper::PixelQuery::ConstPtr &message) 
     {
-        ROS_INFO("xPixelCallback: attempting to secure lock");
+        ROS_INFO("xPixelCb: attempting to secure lock");
         std::lock_guard<std::mutex> guard(mCloudsCacheMutex);
-        ROS_INFO("xPixelCallback: secured lock");
+        ROS_INFO("xPixelCb: secured lock");
         int ind = 0;
         bool cloudFound = false;
 
         std::stringstream cloudSize;
-        cloudSize << "cloud size: " << clouds.size() << "\n";
+        cloudSize << "xPixelCb: cloud size - " << clouds.size();
         ROS_INFO("%s", cloudSize.str().c_str());
 
         for (; ind < clouds.size(); ind++)
@@ -1695,10 +1696,12 @@ namespace zed_wrapper {
                 // publish
                 mPubXPixelToPcLoc.publish(output_msg);
             }
+            else
+                ROS_INFO("xPixelCb: no points to publish");
         }
         else
             ROS_INFO("xPixelCb: cloud missed");
-        ROS_INFO("xPixelCallback: releasing lock");
+        ROS_INFO("xPixelCb: releasing lock");
     }
 
     void ZEDWrapperNodelet::publishPointCloud() {
