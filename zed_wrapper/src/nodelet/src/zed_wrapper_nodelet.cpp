@@ -1637,8 +1637,12 @@ namespace zed_wrapper {
         ROS_INFO("xPixelCb: attempting to secure lock");
         std::lock_guard<std::mutex> guard(mCloudsCacheMutex);
         ROS_INFO("xPixelCb: secured lock");
+        
         int ind = 0;
         bool cloudFound = false;
+        bool verDataPresent = false;
+        bool horDataPresent = false;
+        aisle_keeper::PixelAnswer output_msg;
 
         for (; ind < clouds.size(); ind++)
         {
@@ -1651,59 +1655,98 @@ namespace zed_wrapper {
 
         if (cloudFound)
         {
-            sl::float4 point3d;
-            std::vector<double> x_pts;
-            std::vector<double> y_pts;
-            std::vector<double> z_pts;
-
-            for (int i = 1; i < message->poses.size(); i++)
+            if (message->vertical_query)
             {
-                clouds[ind].second.getValue(size_t(int(message->poses[i].position.y)), size_t(int(message->poses[i].position.x)), &point3d);
-                
-                if (!isnan(point3d.x) && !isnan(point3d.y) && !isnan(point3d.z))
+                sl::float4 point3d;
+                std::vector<double> x_pts;
+                std::vector<double> y_pts;
+
+                for (auto pose : message->vertical_poses)
                 {
-                    x_pts.push_back(point3d.x);
-                    y_pts.push_back(point3d.y);
-                    z_pts.push_back(point3d.z);
+                    clouds[ind].second.getValue(size_t(int(pose.position.y)), size_t(int(pose.position.x)), &point3d);    
+                    if (!isnan(point3d.x) && !isnan(point3d.y))
+                    {
+                        x_pts.push_back(point3d.x);
+                        y_pts.push_back(point3d.y);
+                    }
+                }
+
+                if ((x_pts.size() > 0) && (y_pts.size() > 0))
+                {
+                    std::vector<double> x_mvd = mean_var_dev(x_pts);
+                    std::vector<double> y_mvd = mean_var_dev(y_pts);
+
+                    output_msg.ver_x_obs = x_mvd[0];
+                    output_msg.ver_x_std_dev = x_mvd[2];
+                    output_msg.ver_y_obs = y_mvd[0];
+                    output_msg.ver_y_std_dev = y_mvd[2];
+                    verDataPresent = true;
+                }
+                else
+                {
+                    output_msg.ver_x_obs = std::nan("1");
+                    output_msg.ver_x_std_dev = std::nan("1");
+                    output_msg.ver_y_obs = std::nan("1");
+                    output_msg.ver_y_std_dev = std::nan("1");
+                    ROS_INFO("xPixelCb: NO       vertical points");
                 }
             }
 
-            if ((x_pts.size() > 0) && (y_pts.size() > 0) && (z_pts.size() > 0))
+            if (message->horizontal_query)
             {
-                std::vector<double> x_mvd = mean_var_dev(x_pts);
-                std::vector<double> y_mvd = mean_var_dev(y_pts);
-                std::vector<double> z_mvd = mean_var_dev(z_pts);
+                sl::float4 point3d;
+                std::vector<double> x_pts;
+                std::vector<double> y_pts;
 
-                // construct ros message
-                std_msgs::Float64MultiArray output_msg;
-                output_msg.data.push_back(message->poses[0].position.x);
-                output_msg.data.push_back(x_mvd[0]);
-                output_msg.data.push_back(x_mvd[1]);
-                output_msg.data.push_back(x_mvd[2]);
-                output_msg.data.push_back(y_mvd[0]);
-                output_msg.data.push_back(y_mvd[1]);
-                output_msg.data.push_back(y_mvd[2]);
-                output_msg.data.push_back(z_mvd[0]);
-                output_msg.data.push_back(z_mvd[1]);
-                output_msg.data.push_back(z_mvd[2]);
-                output_msg.data.push_back(clouds[ind].first.sec);
-                output_msg.data.push_back(clouds[ind].first.nsec);
-                output_msg.data.push_back(message->front_side_active);
+                for (auto pose : message->horizontal_poses)
+                {
+                    clouds[ind].second.getValue(size_t(int(pose.position.y)), size_t(int(pose.position.x)), &point3d);    
+                    if (!isnan(point3d.x) && !isnan(point3d.y))
+                    {
+                        x_pts.push_back(point3d.x);
+                        y_pts.push_back(point3d.y);
+                    }
+                }
 
-                ROS_INFO("xPixelCb: publishing points");
-                
-                // publish
+                if ((x_pts.size() > 0) && (y_pts.size() > 0))
+                {
+                    std::vector<double> x_mvd = mean_var_dev(x_pts);
+                    std::vector<double> y_mvd = mean_var_dev(y_pts);
+
+                    output_msg.hor_y_obs = y_mvd[0];
+                    output_msg.hor_y_std_dev = y_mvd[2];
+                    horDataPresent = true;
+                }
+                else
+                {  
+                    output_msg.hor_y_obs = std::nan("1");
+                    output_msg.hor_y_std_dev = std::nan("1");
+                    ROS_INFO("xPixelCb: NO       horizontal points");
+                }
+            }
+
+            if (horDataPresent || verDataPreset)
+            {
+                output_msg.header.stamp = ros::Time()::now();
+                output_msg.zed_number = message->zed_number;
+                output_msg.front_side_active = message->front_side_active;
+                output_msg.zed_cloud_time.data.sec = clouds[ind].first.sec;
+                output_msg.zed_cloud_time.data.nsec = clouds[ind].first.nsec;
                 mPubXPixelToPcLoc.publish(output_msg);
+                ROS_INFO("xPixelCb: publishing points");
             }
             else
-                ROS_INFO("xPixelCb: NO        points to publish");
+                ROS_INFO("xPixelCb: no points to publish");
         }
         else
             ROS_INFO("xPixelCb: cloud missed");
+        
         ROS_INFO("xPixelCb: releasing lock");
     }
 
-    void ZEDWrapperNodelet::publishPointCloud() {
+
+    void ZEDWrapperNodelet::publishPointCloud() 
+    {
         // Publish freq calculation
         static std::chrono::steady_clock::time_point last_time = std::chrono::steady_clock::now();
         std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
