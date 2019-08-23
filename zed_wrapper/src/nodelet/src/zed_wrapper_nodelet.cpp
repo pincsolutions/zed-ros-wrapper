@@ -1564,7 +1564,8 @@ namespace zed_wrapper {
     }
  
     void ZEDWrapperNodelet::yPixelCallback(const aisle_keeper::PixelQuery::ConstPtr &message)
-    {
+    {   
+        /*
         ROS_INFO("yPixelCb: attempting to secure lock");
         std::lock_guard<std::mutex> guard(mCloudsCacheMutex);
         ROS_INFO("yPixelCb: secured lock");
@@ -1630,6 +1631,7 @@ namespace zed_wrapper {
         else
             ROS_INFO("yPixelCb: cloud missed");
         ROS_INFO("yPixelCb: releasing lock");
+        */
     }
 
     void ZEDWrapperNodelet::xPixelCallback(const aisle_keeper::PixelQuery::ConstPtr &message) 
@@ -1646,7 +1648,7 @@ namespace zed_wrapper {
 
         for (; ind < clouds.size(); ind++)
         {
-            if ((message->imageStamp.data.sec == clouds[ind].first.sec) && (message->imageStamp.data.nsec == clouds[ind].first.nsec))
+            if ((message->image_stamp.data.sec == clouds[ind].first.sec) && (message->image_stamp.data.nsec == clouds[ind].first.nsec))
             {
                 cloudFound = true;
                 break;
