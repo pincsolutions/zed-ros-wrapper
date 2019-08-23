@@ -419,10 +419,8 @@ namespace zed_wrapper {
         NODELET_INFO_STREAM("Advertised on topic " << mPubCloud.getTopic());
 
         // initialize pixel to pointcloud subscriber and publisher/pixel
-        mPubYPixelToPcLoc = mNhNs.advertise<std_msgs::Float64MultiArray>("y_pixel_to_pc_location", 1);
-        mPubXPixelToPcLoc = mNhNs.advertise<std_msgs::Float64MultiArray>("x_pixel_to_pc_location", 1);
-        mSubYPixelToPcInquiry = mNhNs.subscribe<aisle_keeper::PixelQuery>("y_pixel_to_pc_inquiry", 1, boost::bind(&zed_wrapper::ZEDWrapperNodelet::yPixelCallback, this, _1));
-        mSubXPixelToPcInquiry = mNhNs.subscribe<aisle_keeper::PixelQuery>("x_pixel_to_pc_inquiry", 1, boost::bind(&zed_wrapper::ZEDWrapperNodelet::xPixelCallback, this, _1));
+        mPubPixelToPcLoc = mNhNs.advertise<aisle_keeper::PixelAnswer>("pixel_to_pc_location", 1);
+        mSubPixelToPcInquiry = mNhNs.subscribe<aisle_keeper::PixelQuery>("pixel_to_pc_inquiry", 1, boost::bind(&zed_wrapper::ZEDWrapperNodelet::pixelInquiryCallback, this, _1));
 
 
 #if ((ZED_SDK_MAJOR_VERSION>2) || (ZED_SDK_MAJOR_VERSION==2 && ZED_SDK_MINOR_VERSION>=8) )
@@ -1563,78 +1561,8 @@ namespace zed_wrapper {
         NODELET_DEBUG("Pointcloud thread finished");
     }
  
-    void ZEDWrapperNodelet::yPixelCallback(const aisle_keeper::PixelQuery::ConstPtr &message)
-    {   
-        /*
-        ROS_INFO("yPixelCb: attempting to secure lock");
-        std::lock_guard<std::mutex> guard(mCloudsCacheMutex);
-        ROS_INFO("yPixelCb: secured lock");
-        
-        int ind = 0;
-        bool cloudFound = false;
 
-        for (; ind < clouds.size(); ind++)
-        {
-            if ((message->imageStamp.data.sec == clouds[ind].first.sec) && (message->imageStamp.data.nsec == clouds[ind].first.nsec))
-            {
-                cloudFound = true;
-                break;
-            }
-        }
-
-        if (cloudFound)
-        {
-            sl::float4 point3d;
-            std::vector<double> x_pts;
-            std::vector<double> y_pts;
-            std::vector<double> z_pts;
-            for (auto pose : message->poses)
-            {
-                //mCloud.getValue(size_t(int(pose.position.y)), size_t(int(pose.position.x)), &point3d);
-                clouds[ind].second.getValue(size_t(int(pose.position.y)), size_t(int(pose.position.x)), &point3d);
-                if (!isnan(point3d.x) && !isnan(point3d.y) && !isnan(point3d.z))
-                {
-                    x_pts.push_back(point3d.x);
-                    y_pts.push_back(point3d.y);
-                    z_pts.push_back(point3d.z);
-                }
-            }
-
-            if ((x_pts.size() > 0) && (y_pts.size() > 0) && (z_pts.size() > 0))
-            {
-                std::vector<double> x_mvd = mean_var_dev(x_pts);
-                std::vector<double> y_mvd = mean_var_dev(y_pts);
-                std::vector<double> z_mvd = mean_var_dev(z_pts);
-
-                // construct ros message
-                std_msgs::Float64MultiArray output_msg;
-                output_msg.data.push_back(x_mvd[0]);
-                output_msg.data.push_back(x_mvd[1]);
-                output_msg.data.push_back(x_mvd[2]);
-                output_msg.data.push_back(y_mvd[0]);
-                output_msg.data.push_back(y_mvd[1]);
-                output_msg.data.push_back(y_mvd[2]);
-                output_msg.data.push_back(z_mvd[0]);
-                output_msg.data.push_back(z_mvd[1]);
-                output_msg.data.push_back(z_mvd[2]);
-                output_msg.data.push_back(clouds[ind].first.sec);
-                output_msg.data.push_back(clouds[ind].first.nsec);
-                output_msg.data.push_back(message->front_side_active);
-
-                // publish
-                mPubYPixelToPcLoc.publish(output_msg);
-                ROS_INFO("yPixelCb: publishing points");
-            }
-            else
-                ROS_INFO("yPixelCb: NO    points to publish");
-        }
-        else
-            ROS_INFO("yPixelCb: cloud missed");
-        ROS_INFO("yPixelCb: releasing lock");
-        */
-    }
-
-    void ZEDWrapperNodelet::xPixelCallback(const aisle_keeper::PixelQuery::ConstPtr &message) 
+    void ZEDWrapperNodelet::pixelInquiryCallback(const aisle_keeper::PixelQuery::ConstPtr &message) 
     {
         ROS_INFO("xPixelCb: attempting to secure lock");
         std::lock_guard<std::mutex> guard(mCloudsCacheMutex);
@@ -1734,7 +1662,7 @@ namespace zed_wrapper {
                 output_msg.front_side_active = message->front_side_active;
                 output_msg.zed_cloud_time.data.sec = clouds[ind].first.sec;
                 output_msg.zed_cloud_time.data.nsec = clouds[ind].first.nsec;
-                mPubXPixelToPcLoc.publish(output_msg);
+                mPubPixelToPcLoc.publish(output_msg);
                 ROS_INFO("xPixelCb: publishing points");
             }
             else
