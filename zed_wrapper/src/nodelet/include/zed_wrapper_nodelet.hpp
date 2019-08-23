@@ -27,6 +27,7 @@
  ****************************************************************************************************/
 #include "sl_tools.h"
 #include "aisle_keeper/PixelQuery.h"
+#include "aisle_keeper/PixelAnswer.h"
 
 #include <sl/Camera.hpp>
 
