@@ -1729,7 +1729,7 @@ namespace zed_wrapper {
 
             if (horDataPresent || verDataPresent)
             {
-                output_msg.header.stamp = ros::Time()::now();
+                output_msg.header.stamp = ros::Time::now();
                 output_msg.zed_number = message->zed_number;
                 output_msg.front_side_active = message->front_side_active;
                 output_msg.zed_cloud_time.data.sec = clouds[ind].first.sec;
