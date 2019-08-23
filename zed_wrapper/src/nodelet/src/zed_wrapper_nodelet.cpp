@@ -1727,7 +1727,7 @@ namespace zed_wrapper {
                 }
             }
 
-            if (horDataPresent || verDataPreset)
+            if (horDataPresent || verDataPresent)
             {
                 output_msg.header.stamp = ros::Time()::now();
                 output_msg.zed_number = message->zed_number;
