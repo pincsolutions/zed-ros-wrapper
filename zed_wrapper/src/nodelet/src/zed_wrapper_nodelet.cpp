@@ -1570,9 +1570,13 @@ namespace zed_wrapper {
         
         int ind = 0;
         bool cloudFound = false;
-        bool verDataPresent = false;
-        bool horDataPresent = false;
-        aisle_keeper::PixelAnswer output_msg;
+
+        bool verFrontDataPresent = false;
+        bool verRearDataPresent = false;
+        bool horFrontDataPresent = false;
+        bool horRearDataPresent = false;
+
+        aisle_keeper::PixelAnswer outputMsg;
 
         for (; ind < clouds.size(); ind++)
         {
@@ -1585,13 +1589,13 @@ namespace zed_wrapper {
 
         if (cloudFound)
         {
-            if (message->vertical_query)
+            if (message->verticalQueryFront)
             {
                 sl::float4 point3d;
                 std::vector<double> x_pts;
                 std::vector<double> y_pts;
 
-                for (auto pose : message->vertical_poses)
+                for (auto pose : message->verticalPixelsFront)
                 {
                     clouds[ind].second.getValue(size_t(int(pose.position.y)), size_t(int(pose.position.x)), &point3d);    
                     if (!isnan(point3d.x) && !isnan(point3d.y))
@@ -1606,29 +1610,29 @@ namespace zed_wrapper {
                     std::vector<double> x_mvd = mean_var_dev(x_pts);
                     std::vector<double> y_mvd = mean_var_dev(y_pts);
 
-                    output_msg.ver_x_obs = x_mvd[0];
-                    output_msg.ver_x_std_dev = x_mvd[2];
-                    output_msg.ver_y_obs = y_mvd[0];
-                    output_msg.ver_y_std_dev = y_mvd[2];
-                    verDataPresent = true;
+                    outputMsg.ver_frontXobs = x_mvd[0];
+                    outputMsg.ver_frontXdev = x_mvd[2];
+                    outputMsg.ver_frontYobs = y_mvd[0];
+                    outputMsg.ver_frontYdev = y_mvd[2];
+                    verFrontDataPresent = true;
                 }
                 else
                 {
-                    output_msg.ver_x_obs = std::nan("1");
-                    output_msg.ver_x_std_dev = std::nan("1");
-                    output_msg.ver_y_obs = std::nan("1");
-                    output_msg.ver_y_std_dev = std::nan("1");
-                    ROS_INFO("xPixelCb: NO       vertical points");
+                    outputMsg.ver_frontXobs = std::nan("1");
+                    outputMsg.ver_frontXdev = std::nan("1");
+                    outputMsg.ver_frontYobs = std::nan("1");
+                    outputMsg.ver_frontYdev = std::nan("1");
+                    ROS_INFO("PixelCb: NO       vertical front points");
                 }
             }
 
-            if (message->horizontal_query)
+            if (message->verticalQueryRear)
             {
                 sl::float4 point3d;
                 std::vector<double> x_pts;
                 std::vector<double> y_pts;
 
-                for (auto pose : message->horizontal_poses)
+                for (auto pose : message->verticalPixelsRear)
                 {
                     clouds[ind].second.getValue(size_t(int(pose.position.y)), size_t(int(pose.position.x)), &point3d);    
                     if (!isnan(point3d.x) && !isnan(point3d.y))
@@ -1643,30 +1647,99 @@ namespace zed_wrapper {
                     std::vector<double> x_mvd = mean_var_dev(x_pts);
                     std::vector<double> y_mvd = mean_var_dev(y_pts);
 
-                    output_msg.hor_y_obs = y_mvd[0];
-                    output_msg.hor_y_std_dev = y_mvd[2];
-                    horDataPresent = true;
+                    outputMsg.ver_rearXobs = x_mvd[0];
+                    outputMsg.ver_rearXdev = x_mvd[2];
+                    outputMsg.ver_rearYobs = y_mvd[0];
+                    outputMsg.ver_rearYdev = y_mvd[2];
+                    verRearDataPresent = true;
+                }
+                else
+                {
+                    outputMsg.ver_rearXobs = std::nan("1");
+                    outputMsg.ver_rearXdev = std::nan("1");
+                    outputMsg.ver_rearYobs = std::nan("1");
+                    outputMsg.ver_rearYdev = std::nan("1");
+                    ROS_INFO("PixelCb: NO       vertical rear points");
+                }
+            }
+
+            if (message->horizontalQueryFront)
+            {
+                sl::float4 point3d;
+                std::vector<double> x_pts;
+                std::vector<double> y_pts;
+
+                for (auto pose : message->horizontalPixelsFront)
+                {
+                    clouds[ind].second.getValue(size_t(int(pose.position.y)), size_t(int(pose.position.x)), &point3d);    
+                    if (!isnan(point3d.x) && !isnan(point3d.y))
+                    {
+                        x_pts.push_back(point3d.x);
+                        y_pts.push_back(point3d.y);
+                    }
+                }
+
+                if ((x_pts.size() > 0) && (y_pts.size() > 0))
+                {
+                    std::vector<double> x_mvd = mean_var_dev(x_pts);
+                    std::vector<double> y_mvd = mean_var_dev(y_pts);
+
+                    outputMsg.hor_frontYobs = y_mvd[0];
+                    outputMsg.hor_frontYdev = y_mvd[2];
+                    horFrontDataPresent = true;
                 }
                 else
                 {  
-                    output_msg.hor_y_obs = std::nan("1");
-                    output_msg.hor_y_std_dev = std::nan("1");
-                    ROS_INFO("xPixelCb: NO       horizontal points");
+                    outputMsg.hor_frontYobs = std::nan("1");
+                    outputMsg.hor_frontYdev = std::nan("1");
+                    ROS_INFO("PixelCb: NO       horizontal front points");
                 }
             }
 
-            if (horDataPresent || verDataPresent)
+            if (message->horizontalQueryRear)
             {
-                output_msg.header.stamp = ros::Time::now();
-                output_msg.zed_number = message->zed_number;
-                output_msg.front_side_active = message->front_side_active;
-                output_msg.zed_cloud_time.data.sec = clouds[ind].first.sec;
-                output_msg.zed_cloud_time.data.nsec = clouds[ind].first.nsec;
-                mPubPixelToPcLoc.publish(output_msg);
-                ROS_INFO("xPixelCb: publishing points");
+                sl::float4 point3d;
+                std::vector<double> x_pts;
+                std::vector<double> y_pts;
+
+                for (auto pose : message->horizontalPixelsRear)
+                {
+                    clouds[ind].second.getValue(size_t(int(pose.position.y)), size_t(int(pose.position.x)), &point3d);    
+                    if (!isnan(point3d.x) && !isnan(point3d.y))
+                    {
+                        x_pts.push_back(point3d.x);
+                        y_pts.push_back(point3d.y);
+                    }
+                }
+
+                if ((x_pts.size() > 0) && (y_pts.size() > 0))
+                {
+                    std::vector<double> x_mvd = mean_var_dev(x_pts);
+                    std::vector<double> y_mvd = mean_var_dev(y_pts);
+
+                    outputMsg.hor_rearYobs = y_mvd[0];
+                    outputMsg.hor_rearYdev = y_mvd[2];
+                    horRearDataPresent = true;
+                }
+                else
+                {  
+                    outputMsg.hor_rearYobs = std::nan("1");
+                    outputMsg.hor_rearYdev = std::nan("1");
+                    ROS_INFO("PixelCb: NO       horizontal rear points");
+                }
+            }
+
+            if (horFrontDataPresent || verFrontDataPresent || verRearDataPresent || horRearDataPresent)
+            {
+                outputMsg.header.stamp = ros::Time::now();
+                outputMsg.zedCloudStamp.data.sec = clouds[ind].first.sec;
+                outputMsg.zedCloudStamp.data.nsec = clouds[ind].first.nsec;
+                outputMsg.zedImageSeq = message->imageSeq;
+                mPubPixelToPcLoc.publish(outputMsg);
+                ROS_INFO("PixelCb: publishing points");
             }
             else
-                ROS_INFO("xPixelCb: no points to publish");
+                ROS_INFO("PixelCb: no points to publish");
         }
         else
             ROS_INFO("xPixelCb: cloud missed");
