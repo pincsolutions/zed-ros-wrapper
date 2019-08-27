@@ -1580,7 +1580,7 @@ namespace zed_wrapper {
 
         for (; ind < clouds.size(); ind++)
         {
-            if ((message->image_stamp.data.sec == clouds[ind].first.sec) && (message->image_stamp.data.nsec == clouds[ind].first.nsec))
+            if ((message->imageStamp.data.sec == clouds[ind].first.sec) && (message->imageStamp.data.nsec == clouds[ind].first.nsec))
             {
                 cloudFound = true;
                 break;
@@ -1732,9 +1732,11 @@ namespace zed_wrapper {
             if (horFrontDataPresent || verFrontDataPresent || verRearDataPresent || horRearDataPresent)
             {
                 outputMsg.header.stamp = ros::Time::now();
-                outputMsg.zedCloudStamp.data.sec = clouds[ind].first.sec;
-                outputMsg.zedCloudStamp.data.nsec = clouds[ind].first.nsec;
-                outputMsg.zedImageSeq = message->imageSeq;
+                outputMsg.cloudStamp.data.sec = clouds[ind].first.sec;
+                outputMsg.cloudStamp.data.nsec = clouds[ind].first.nsec;
+                outputMsg.imageStamp.data.sec = message->imageStamp.data.sec;
+                outputMsg.imageStamp.data.nsec = message->imageStamp.data.nsec;
+                outputMsg.imageSeq = message->imageSeq;
                 mPubPixelToPcLoc.publish(outputMsg);
                 ROS_INFO("PixelCb: publishing points");
             }
