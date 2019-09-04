@@ -2657,24 +2657,28 @@ namespace zed_wrapper {
                 {
                     double current_time = ros::Time::now().toSec();
 
-                    // update point cloud queue
-                    std::unique_lock<std::mutex> lockCloudsCache(mCloudsCacheMutex, std::defer_lock);
-                    if (lockCloudsCache.try_lock())
+                    if ((current_time - imagePublishStamp) > imagePublishInterval)
                     {
-                        mZed.retrieveMeasure(mCloud, sl::MEASURE_XYZBGRA, sl::MEM_CPU, mMatWidth, mMatHeight);
-                        //ROS_INFO_THROTTLE(1, "cloudLoop: acquired vector lock");
-                        // maintain queue size
-                        while(clouds.size() > 500)
-                            clouds.erase(clouds.begin());
-                    
-                        // append new cloud data
-                        clouds.push_back(std::make_pair(mFrameTimestamp, mCloud));
-                        mPcAvailable = true;
-                    }
-                    else
-                    {
-                        ROS_INFO("cloudLoop: could not acquire vector lock");
-                        mPcAvailable = false;
+                        // update point cloud queue
+                        std::unique_lock<std::mutex> lockCloudsCache(mCloudsCacheMutex, std::defer_lock);
+                        if (lockCloudsCache.try_lock())
+                        {
+                            mZed.retrieveMeasure(mCloud, sl::MEASURE_XYZBGRA, sl::MEM_CPU, mMatWidth, mMatHeight);
+                            //ROS_INFO_THROTTLE(1, "cloudLoop: acquired vector lock");
+                            // maintain queue size
+                            while(clouds.size() > 500)
+                                clouds.erase(clouds.begin());
+                        
+                            // append new cloud data
+                            clouds.push_back(std::make_pair(mFrameTimestamp, mCloud));
+                            mPcAvailable = true;
+                            imagePublishStamp = current_time;
+                        }
+                        else
+                        {
+                            ROS_INFO("cloudLoop: could not acquire vector lock");
+                            mPcAvailable = false;
+                        }
                     }
 
                     if ((current_time - pcPublishStamp) > pcPublishInterval)
