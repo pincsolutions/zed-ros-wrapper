@@ -1807,7 +1807,7 @@ namespace zed_wrapper {
 #endif
 
         std::string error;
-        sensor_msgs::PointCloud2Ptr out;
+        sensor_msgs::PointCloud2 out;
         bool successfulPcTransformZed1 = false;
         bool successfulPcTransformZed2 = false;
 
@@ -1833,9 +1833,10 @@ namespace zed_wrapper {
                                                                     mPointcloudMsg->header.frame_id, ros::Time(0), 
                                                                     ros::Duration(1.0) );
                     ROS_INFO("Y");
-                    tf2::doTransform(*mPointcloudMsg, *out, cloudTransform);
                     
-                    out->header.frame_id = "fcu";
+                    sensor_msgs::PointCloud2 in(*mPointcloudMsg);
+                    tf2::doTransform(in, out, cloudTransform);
+                    out.header.frame_id = "fcu";
                     successfulPcTransformZed1 = true;
                 }
                 else
@@ -1850,9 +1851,9 @@ namespace zed_wrapper {
                                                                     ros::Duration(1.0) );
                                                                     
                     ROS_INFO("X");
-                    tf2::doTransform(*mPointcloudMsg, *out, cloudTransform);
-                    
-                    out->header.frame_id = "fcu";
+                    sensor_msgs::PointCloud2 in(*mPointcloudMsg);
+                    tf2::doTransform(in, out, cloudTransform);
+                    out.header.frame_id = "fcu";
                     successfulPcTransformZed2 = true;
                 }
                 else
