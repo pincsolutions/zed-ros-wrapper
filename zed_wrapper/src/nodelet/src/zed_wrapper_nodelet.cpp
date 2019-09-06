@@ -34,6 +34,13 @@
 #include <std_msgs/Float64MultiArray.h>
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
+#include <tf2_sensor_msgs/tf2_sensor_msgs.h>
+
+#include <tf2_ros/buffer.h>
+#include <tf2/transform_datatypes.h>
+#include <tf2_sensor_msgs/tf2_sensor_msgs.h>
+
+
 #include <cmath>
 #include <chrono>
 
@@ -1839,8 +1846,6 @@ namespace zed_wrapper {
                     out.header.frame_id = "fcu";
                     successfulPcTransformZed1 = true;
                 }
-                else
-                    NODELET_WARN_STREAM_THROTTLE(1.0, error);
                 
                 ROS_INFO("C");
 
@@ -1856,8 +1861,6 @@ namespace zed_wrapper {
                     out.header.frame_id = "fcu";
                     successfulPcTransformZed2 = true;
                 }
-                else
-                    NODELET_WARN_STREAM_THROTTLE(1.0, error);
 
                 ROS_INFO("D");
             }

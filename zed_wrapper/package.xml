@@ -28,6 +28,7 @@
   <depend>nodelet</depend>
   <depend>diagnostic_updater</depend>
   <depend>aisle_keeper</depend>
+  <depend>geometry_msgs</depend>
   
   <build_depend>urdf</build_depend>
   <build_depend>message_generation</build_depend>

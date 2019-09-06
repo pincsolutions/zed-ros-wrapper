@@ -48,12 +48,14 @@ find_package(catkin COMPONENTS
   tf2_ros
   nodelet
   tf2_geometry_msgs
+  tf2_sensor_msgs
   message_generation
   diagnostic_updater
   roslint
   aisle_keeper
   tf2
   tf2_sensor_msgs
+  geometry_msgs
 )
 
 checkPackage("image_transport" "")
@@ -67,6 +69,8 @@ checkPackage("tf2" "")
 checkPackage("nodelet" "")
 checkPackage("tf2_geometry_msgs" "")
 checkPackage("message_generation" "")
+checkPackage("geometry_msgs" "")
+checkPackage("tf2_sensor_msgs" "")
 
 add_service_files( FILES
     set_pose.srv
@@ -100,6 +104,7 @@ catkin_package(
     tf2_sensor_msgs
     message_runtime
     aisle_keeper
+    geometry_msgs
 )
 
 ###############################################################################
