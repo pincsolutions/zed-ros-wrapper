@@ -559,7 +559,8 @@ namespace zed_wrapper {
 
         // get node name
         mNhNs.param<std::string>("general/node_name", mNodeName, "");
-        
+        NODELET_INFO_STREAM("Node Name:  " << mNodeName);
+
         // <---- General
 
         // ----> Video
