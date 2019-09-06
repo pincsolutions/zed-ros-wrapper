@@ -1831,6 +1831,7 @@ namespace zed_wrapper {
                     geometry_msgs::TransformStamped cloudTransform = mTfBuffer->lookupTransform("base_link_1", 
                                                                     mPointcloudMsg->header.frame_id, ros::Time(0), 
                                                                     ros::Duration(1.0) );
+                    ROS_INFO("Y");
                     tf2::doTransform(*mPointcloudMsg, *out, cloudTransform);
                     
                     out->header.frame_id = "fcu";
@@ -1846,6 +1847,8 @@ namespace zed_wrapper {
                     geometry_msgs::TransformStamped cloudTransform = mTfBuffer->lookupTransform("base_link_2", 
                                                                     mPointcloudMsg->header.frame_id, ros::Time(0), 
                                                                     ros::Duration(1.0) );
+                                                                    
+                    ROS_INFO("X");
                     tf2::doTransform(*mPointcloudMsg, *out, cloudTransform);
                     
                     out->header.frame_id = "fcu";
