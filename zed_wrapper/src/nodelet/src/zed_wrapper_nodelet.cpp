@@ -558,7 +558,7 @@ namespace zed_wrapper {
         NODELET_INFO_STREAM(" * Enable Cam IMU\t\t-> " << (mDisableCameraImu ? "DISABLED" : "ENABLED"));
 
         // get node name
-        mNhNs.getParam<std::string>("general/node_name", mNodeName, "");
+        mNhNs.param<std::string>("general/node_name", mNodeName, "");
         
         // <---- General
 
