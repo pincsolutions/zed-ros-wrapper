@@ -1861,10 +1861,7 @@ namespace zed_wrapper {
         }
 
         if (successfulPcTransformZed1 || successfulPcTransformZed2)
-        {
-            ROS_INFO("E");
             mPubCloud.publish(out);
-        }
     }
 
     void ZEDWrapperNodelet::pubFusedPointCloudCallback(const ros::TimerEvent& e) {
