@@ -1825,29 +1825,22 @@ namespace zed_wrapper {
                 bool canTransformZed1 = false;
                 bool canTransformZed2 = false;
 
-                ROS_INFO("A");
-
                 if (mNodeName == "zed1")
                     canTransformZed1 = mTfBuffer->canTransform("base_link_1", mPointcloudMsg->header.frame_id, mPointcloudMsg->header.stamp, &error);
                 if (mNodeName == "zed2")
                     canTransformZed2 = mTfBuffer->canTransform("base_link_2", mPointcloudMsg->header.frame_id, mPointcloudMsg->header.stamp, &error);
-
-                ROS_INFO("B");
 
                 if(canTransformZed1)
                 {
                     geometry_msgs::TransformStamped cloudTransform = mTfBuffer->lookupTransform("base_link_1", 
                                                                     mPointcloudMsg->header.frame_id, ros::Time(0), 
                                                                     ros::Duration(1.0) );
-                    ROS_INFO("Y");
-                    
+
                     sensor_msgs::PointCloud2 in(*mPointcloudMsg);
                     tf2::doTransform(in, out, cloudTransform);
                     out.header.frame_id = "fcu";
                     successfulPcTransformZed1 = true;
                 }
-                
-                ROS_INFO("C");
 
                 if (canTransformZed2)
                 {
@@ -1855,19 +1848,16 @@ namespace zed_wrapper {
                                                                     mPointcloudMsg->header.frame_id, ros::Time(0), 
                                                                     ros::Duration(1.0) );
                                                                     
-                    ROS_INFO("X");
                     sensor_msgs::PointCloud2 in(*mPointcloudMsg);
                     tf2::doTransform(in, out, cloudTransform);
                     out.header.frame_id = "fcu";
                     successfulPcTransformZed2 = true;
                 }
-
-                ROS_INFO("D");
             }
         }
         catch (...)
         {
-            NODELET_DEBUG_STREAM("exception when transforming zed1 pointcloud");
+            NODELET_DEBUG_STREAM("exception when transforming pointcloud");
         }
 
         if (successfulPcTransformZed1 || successfulPcTransformZed2)
@@ -1875,12 +1865,6 @@ namespace zed_wrapper {
             ROS_INFO("E");
             mPubCloud.publish(out);
         }
-        else
-        {
-            ROS_INFO("F");
-            mPubCloud.publish(mPointcloudMsg);
-        }
-        ROS_INFO("G");
     }
 
     void ZEDWrapperNodelet::pubFusedPointCloudCallback(const ros::TimerEvent& e) {
