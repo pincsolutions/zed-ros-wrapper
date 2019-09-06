@@ -1817,10 +1817,14 @@ namespace zed_wrapper {
                 bool canTransformZed1 = false;
                 bool canTransformZed2 = false;
 
+                ROS_INFO("A");
+
                 if (mNodeName == "zed1")
                     canTransformZed1 = mTfBuffer->canTransform("base_link_1", mPointcloudMsg->header.frame_id, mPointcloudMsg->header.stamp, &error);
                 if (mNodeName == "zed2")
                     canTransformZed2 = mTfBuffer->canTransform("base_link_2", mPointcloudMsg->header.frame_id, mPointcloudMsg->header.stamp, &error);
+
+                ROS_INFO("B");
 
                 if(canTransformZed1)
                 {
@@ -1835,6 +1839,8 @@ namespace zed_wrapper {
                 else
                     NODELET_WARN_STREAM_THROTTLE(1.0, error);
                 
+                ROS_INFO("C");
+
                 if (canTransformZed2)
                 {
                     geometry_msgs::TransformStamped cloudTransform = mTfBuffer->lookupTransform("base_link_2", 
@@ -1847,6 +1853,8 @@ namespace zed_wrapper {
                 }
                 else
                     NODELET_WARN_STREAM_THROTTLE(1.0, error);
+
+                ROS_INFO("D");
             }
         }
         catch (...)
@@ -1855,9 +1863,16 @@ namespace zed_wrapper {
         }
 
         if (successfulPcTransformZed1 || successfulPcTransformZed2)
+        {
+            ROS_INFO("E");
             mPubCloud.publish(out);
+        }
         else
+        {
+            ROS_INFO("F");
             mPubCloud.publish(mPointcloudMsg);
+        }
+        ROS_INFO("G");
     }
 
     void ZEDWrapperNodelet::pubFusedPointCloudCallback(const ros::TimerEvent& e) {
