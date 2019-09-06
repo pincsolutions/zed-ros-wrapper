@@ -555,8 +555,10 @@ namespace zed_wrapper {
         mNhNs.getParam("general/coordinate_system", mCoordinateSystem); 
         mNhNs.getParam("general/camera_disable_imu", mDisableCameraImu);
         NODELET_INFO_STREAM(" * Enable Cam IMU\t\t-> " << (mDisableCameraImu ? "DISABLED" : "ENABLED"));
-        
 
+        // get node name
+        mNhNs.getParam<std::string>("general/node_name", mNodeName, "");
+        
         // <---- General
 
         // ----> Video
@@ -1802,8 +1804,59 @@ namespace zed_wrapper {
 
 #endif
 
-        // Pointcloud publishing
-        mPubCloud.publish(mPointcloudMsg);
+        std::string error;
+        sensor_msgs::PointCloud2Ptr out;
+        bool successfulPcTransformZed1 = false;
+        bool successfulPcTransformZed2 = false;
+
+        try
+        {
+            if (mNodeName != "")
+            {
+                bool canTransformZed1 = false;
+                bool canTransformZed2 = false;
+
+                if (mNodeName == "zed1")
+                    canTransformZed1 = mTfBuffer->canTransform("base_link_1", mPointcloudMsg->header.frame_id, mPointcloudMsg->header.stamp, &error);
+                if (mNodeName == "zed2")
+                    canTransformZed2 = mTfBuffer->canTransform("base_link_2", mPointcloudMsg->header.frame_id, mPointcloudMsg->header.stamp, &error);
+
+                if(canTransformZed1)
+                {
+                    geometry_msgs::TransformStamped cloudTransform = mTfBuffer->lookupTransform("base_link_1", 
+                                                                    mPointcloudMsg->header.frame_id, ros::Time(0), 
+                                                                    ros::Duration(1.0) );
+                    tf2::doTransform(*mPointcloudMsg, *out, cloudTransform);
+                    
+                    out->header.frame_id = "fcu";
+                    successfulPcTransformZed1 = true;
+                }
+                else
+                    NODELET_WARN_STREAM_THROTTLE(1.0, error);
+                
+                if (canTransformZed2)
+                {
+                    geometry_msgs::TransformStamped cloudTransform = mTfBuffer->lookupTransform("base_link_2", 
+                                                                    mPointcloudMsg->header.frame_id, ros::Time(0), 
+                                                                    ros::Duration(1.0) );
+                    tf2::doTransform(*mPointcloudMsg, *out, cloudTransform);
+                    
+                    out->header.frame_id = "fcu";
+                    successfulPcTransformZed2 = true;
+                }
+                else
+                    NODELET_WARN_STREAM_THROTTLE(1.0, error);
+            }
+        }
+        catch (...)
+        {
+            NODELET_DEBUG_STREAM("exception when transforming zed1 pointcloud");
+        }
+
+        if (successfulPcTransformZed1 || successfulPcTransformZed2)
+            mPubCloud.publish(out);
+        else
+            mPubCloud.publish(mPointcloudMsg);
     }
 
     void ZEDWrapperNodelet::pubFusedPointCloudCallback(const ros::TimerEvent& e) {

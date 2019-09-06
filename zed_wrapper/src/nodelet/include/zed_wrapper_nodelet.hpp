@@ -456,6 +456,9 @@ namespace zed_wrapper {
         std::string mImuTopicRoot;
         std::string mStereoTopicRoot;
 
+        // Node Name
+        std::string mNodeName;
+
         // Last frame time
         ros::Time mPrevFrameTimestamp;
         ros::Time mFrameTimestamp;
