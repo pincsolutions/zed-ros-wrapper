@@ -1600,6 +1600,13 @@ namespace zed_wrapper {
 
         if (cloudFound)
         {
+            // print out debug data
+            std::stringstream ss;
+            ss << "cloud found." << "\n";
+            ss << "cloud vector size: " << clouds.size() << "\n";
+            ss << "cloud vector index: " << ind;
+            ROS_INFO("%s", ss.str().c_str());
+
             if (message->verticalQueryFront)
             {
                 sl::float4 point3d;
@@ -2724,7 +2731,7 @@ namespace zed_wrapper {
                             mZed.retrieveMeasure(mCloud, sl::MEASURE_XYZBGRA, sl::MEM_CPU, mMatWidth, mMatHeight);
                             //ROS_INFO_THROTTLE(1, "cloudLoop: acquired vector lock");
                             // maintain queue size
-                            while(clouds.size() > 500)
+                            while(clouds.size() > 200)
                                 clouds.erase(clouds.begin());
                         
                             // append new cloud data
