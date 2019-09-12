@@ -2770,6 +2770,7 @@ namespace zed_wrapper {
 
                     if (leftSubnumber > 0 && mPcAvailable) {
                         publishImage(leftZEDMat, mPubLeft, mLeftCamInfoMsg, mLeftCamOptFrameId, mFrameTimestamp);
+                        mPcAvailable = false;
                     }
 
                     if (rgbSubnumber > 0) {

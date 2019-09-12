@@ -535,8 +535,8 @@ namespace zed_wrapper {
         int mMatHeight;
 
         // Pointcloud publish interval
-        double pcPublishInterval = 0.2; // 5 hz
-        double imagePublishInterval = 0.1; // 10 hz
+        double pcPublishInterval = 0.1; // 10 hz
+        double imagePublishInterval = 0.05; // 20 hz
         double pcPublishStamp = 0.0;
         double imagePublishStamp = 0.0;
 
