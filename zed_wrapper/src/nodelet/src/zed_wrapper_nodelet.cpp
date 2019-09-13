@@ -1602,9 +1602,9 @@ namespace zed_wrapper {
         {
             // print out debug data
             std::stringstream ss;
-            ss << "cloud found." << "\n";
-            ss << "cloud vector size: " << clouds.size() << "\n";
-            ss << "cloud vector index: " << ind;
+            ss << "PixelCb: cloud found" << "\n";
+            ss << "PixelCb: cloud vector size - " << clouds.size() << "\n";
+            ss << "PixelCb: cloud vector index -" << ind;
             ROS_INFO("%s", ss.str().c_str());
 
             if (message->verticalQueryFront)
@@ -1762,9 +1762,9 @@ namespace zed_wrapper {
                 ROS_INFO("PixelCb: no points to publish");
         }
         else
-            ROS_INFO("xPixelCb: cloud missed");
+            ROS_INFO("PixelCb: cloud missed");
         
-        ROS_INFO("xPixelCb: releasing lock");
+        ROS_INFO("PixelCb: releasing lock");
     }
 
 
