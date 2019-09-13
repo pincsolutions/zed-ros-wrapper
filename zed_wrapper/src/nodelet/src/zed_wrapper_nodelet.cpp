@@ -1575,9 +1575,9 @@ namespace zed_wrapper {
 
     void ZEDWrapperNodelet::pixelInquiryCallback(const aisle_keeper::PixelQuery::ConstPtr &message) 
     {
-        ROS_INFO("xPixelCb: attempting to secure lock");
+        ROS_INFO("PixelCb: attempting to secure lock");
         std::lock_guard<std::mutex> guard(mCloudsCacheMutex);
-        ROS_INFO("xPixelCb: secured lock");
+        ROS_INFO("PixelCb: secured lock");
         
         int ind = 0;
         bool cloudFound = false;
@@ -2731,7 +2731,7 @@ namespace zed_wrapper {
                             mZed.retrieveMeasure(mCloud, sl::MEASURE_XYZBGRA, sl::MEM_CPU, mMatWidth, mMatHeight);
                             //ROS_INFO_THROTTLE(1, "cloudLoop: acquired vector lock");
                             // maintain queue size
-                            while(clouds.size() > 200)
+                            while(clouds.size() > 100)
                                 clouds.erase(clouds.begin());
                         
                             // append new cloud data
