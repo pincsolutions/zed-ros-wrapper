@@ -27,7 +27,7 @@
   <depend>dynamic_reconfigure</depend>
   <depend>nodelet</depend>
   <depend>diagnostic_updater</depend>
-  <depend>aisle_keeper</depend>
+  <depend>pincair_msg</depend>
   <depend>geometry_msgs</depend>
   
   <build_depend>urdf</build_depend>
