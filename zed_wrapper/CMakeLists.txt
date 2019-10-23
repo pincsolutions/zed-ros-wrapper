@@ -52,7 +52,7 @@ find_package(catkin COMPONENTS
   message_generation
   diagnostic_updater
   roslint
-  pincair_msgs
+  aisle_keeper
   tf2
   tf2_sensor_msgs
   geometry_msgs
@@ -103,7 +103,7 @@ catkin_package(
     tf2
     tf2_sensor_msgs
     message_runtime
-    pincair_msgs
+    aisle_keeper
     geometry_msgs
 )
 

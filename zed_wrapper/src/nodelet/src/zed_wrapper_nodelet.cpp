@@ -427,8 +427,8 @@ namespace zed_wrapper {
         NODELET_INFO_STREAM("Advertised on topic " << mPubCloud.getTopic());
 
         // initialize pixel to pointcloud subscriber and publisher/pixel
-        mPubPixelToPcLoc = mNhNs.advertise<pincair_msgs::PixelAnswer>("pixel_to_pc_location", 1);
-        mSubPixelToPcInquiry = mNhNs.subscribe<pincair_msgs::PixelQuery>("pixel_to_pc_inquiry", 1, boost::bind(&zed_wrapper::ZEDWrapperNodelet::pixelInquiryCallback, this, _1));
+        mPubPixelToPcLoc = mNhNs.advertise<aisle_keeper::PixelAnswer>("pixel_to_pc_location", 1);
+        mSubPixelToPcInquiry = mNhNs.subscribe<aisle_keeper::PixelQuery>("pixel_to_pc_inquiry", 1, boost::bind(&zed_wrapper::ZEDWrapperNodelet::pixelInquiryCallback, this, _1));
 
 
 #if ((ZED_SDK_MAJOR_VERSION>2) || (ZED_SDK_MAJOR_VERSION==2 && ZED_SDK_MINOR_VERSION>=8) )
@@ -1573,7 +1573,7 @@ namespace zed_wrapper {
     }
  
 
-    void ZEDWrapperNodelet::pixelInquiryCallback(const pincair_msgs::PixelQuery::ConstPtr &message) 
+    void ZEDWrapperNodelet::pixelInquiryCallback(const aisle_keeper::PixelQuery::ConstPtr &message) 
     {
         ROS_INFO("PixelCb: attempting to secure lock");
         std::lock_guard<std::mutex> guard(mCloudsCacheMutex);
@@ -1587,7 +1587,7 @@ namespace zed_wrapper {
         bool horFrontDataPresent = false;
         bool horRearDataPresent = false;
 
-        pincair_msgs::PixelAnswer outputMsg;
+        aisle_keeper::PixelAnswer outputMsg;
 
         for (; ind < clouds.size(); ind++)
         {

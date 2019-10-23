@@ -26,8 +26,8 @@
  ** A set of parameters can be specified in the launch file.                                       **
  ****************************************************************************************************/
 #include "sl_tools.h"
-#include "pincair_msgs/PixelQuery.h"
-#include "pincair_msgs/PixelAnswer.h"
+#include "aisle_keeper/PixelQuery.h"
+#include "aisle_keeper/PixelAnswer.h"
 
 #include <sl/Camera.hpp>
 
@@ -164,7 +164,7 @@ namespace zed_wrapper {
          /* \brief Takes in a pixel location and finds corresponding location point cloud.
                     Used in corrected x drift, externally.
          */
-        void pixelInquiryCallback(const pincair_msgs::PixelQuery::ConstPtr &message);
+        void pixelInquiryCallback(const aisle_keeper::PixelQuery::ConstPtr &message);
 
 
         /* \brief Publish a fused pointCloud with a ros Publisher
@@ -554,7 +554,7 @@ namespace zed_wrapper {
         sl::Mat mCloud;
         sl::Mat mCloudReduced;
         std::vector<std::pair<ros::Time, sl::Mat>> clouds;
-        pincair_msgs::PixelQuery pQ;
+        aisle_keeper::PixelQuery pQ;
 
         sensor_msgs::PointCloud2Ptr mPointcloudMsg;
 #if ((ZED_SDK_MAJOR_VERSION>2) || (ZED_SDK_MAJOR_VERSION==2 && ZED_SDK_MINOR_VERSION>=8) )
