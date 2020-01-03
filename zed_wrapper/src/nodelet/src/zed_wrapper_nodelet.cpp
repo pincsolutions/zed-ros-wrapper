@@ -132,8 +132,8 @@ namespace zed_wrapper {
             depth_topic += "/depth_registered";
         }
 
-        //string pointcloud_topic = mPointCloudTopicRoot + "/cloud_registered";
-        string pointcloud_topic = "/zedCloudsTransformed";
+        string pointcloud_topic = mPointCloudTopicRoot + "/cloud_registered";
+        //string pointcloud_topic = "/zedCloudsTransformed";
         string pointcloud_fused_topic = mPointCloudTopicRoot + "/fused_cloud_registered";
 
         string conf_img_topic_name = "confidence_image";
