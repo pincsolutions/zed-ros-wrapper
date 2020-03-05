@@ -1,0 +1,42 @@
+p!/usr/bin/env python
+import rospy
+import time
+import numpy as np
+from tf.transformations import euler_from_quaternion, quaternion_from_euler
+from sensor_msgs.msg import Imu
+ 
+class Calibrate_IMU_Offset:
+
+	def __init__(self):
+
+		self.fcu_sub = rospy.Subscriber('/mavros/imu/data',Imu , self.fcu_imu_cb)
+		self.zed1_imu_sub = rospy.Subscriber('/zed1/imu/data',Imu,self.zed1_imu_cb)
+		self.zed2_imu_sub = rospy.Subscriber('/zed2/imu/data',Imu, self.zed2_imu_cb)
+
+	
+	def fcu_imu_cb(self, msg):
+		self.fcu_imu = msg
+		print "fcu"
+		msg.orientation.x
+		msg.orientation.y
+		msg.orientation.z
+		msg.orientation.w
+ 		rpy = euler_from_quaternion((msg.orientation.x, msg.orientation.y, msg.orientation.z, msg.orientation.w))
+		print rpy
+		return
+
+	def zed1_imu_cb(self, msg):
+		self.zed1_imu = msg
+		print "zed 1"
+		return
+
+	def zed2_imu_cb(self, msg):
+		self.zed2_imu = msg
+		print "zed 2"
+		return
+
+if __name__ == '__main__':
+	rospy.init_node('calibrate_imu_offset', anonymous=False)
+	calibrate = Calibrate_IMU_Offset()
+	rospy.spin()
+
